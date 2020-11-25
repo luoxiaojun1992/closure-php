@@ -1,0 +1,23 @@
+{
+    "name": "luoxiaojun/closure-php",
+    "type": "library",
+    "license": "apache-2.0",
+    "authors": [
+        {
+            "name": "luoxiaojun",
+            "email": "luoxiaojun1992@sina.cn"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Lxj\\ClosurePHP\\": "src/"
+        },
+        "files": ["src/Sugars/Object.php"]
+    },
+    "description": "",
+    "require-dev": {
+        "phpunit/phpunit": "~7.5|~8.1"
+    }
+}
