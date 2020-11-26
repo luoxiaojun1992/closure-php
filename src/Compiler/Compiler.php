@@ -38,6 +38,6 @@ class Compiler
 
     protected function generateCode($ast)
     {
-
+        return '';
     }
 }

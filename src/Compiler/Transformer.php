@@ -6,6 +6,6 @@ class Transformer
 {
     public function transform($ast)
     {
-
+        return $ast;
     }
 }
