@@ -20,4 +20,19 @@ class Compiler
     {
 
     }
+
+    protected function parseAst()
+    {
+
+    }
+
+    protected function transform($ast)
+    {
+
+    }
+
+    protected function generateCode()
+    {
+
+    }
 }
