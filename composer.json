@@ -9,7 +9,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "nikic/php-parser": "~v4.2"
+    },
     "autoload": {
         "psr-4": {
             "Lxj\\ClosurePHP\\": "src/"
