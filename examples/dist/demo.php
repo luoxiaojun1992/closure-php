@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 global $classDefinitions;
 $classDefinitions = array (
@@ -57,7 +57,7 @@ $classDefinitions = array (
                                 ),
                         ),
                 ),
-            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/output/Foo.php',
+            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/examples/dist/Foo.php',
         ),
     'Lxj\\ClosurePHP\\Demo\\Bar' =>
         array (
@@ -137,7 +137,7 @@ $classDefinitions = array (
                         ),
                 ),
             'extends' => 'Lxj\\ClosurePHP\\Demo\\Foo',
-            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/output/Bar.php',
+            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/examples/dist/Bar.php',
         ),
 );
 

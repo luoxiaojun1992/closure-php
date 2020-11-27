@@ -39,10 +39,12 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
         throw new \Exception('Class ' . $class . ' not existed');
     }
 
-    if (!isset($classDefinitions[$class]['methods']['instance'][$scope][$method])) {
-        if (isset($classDefinitions[$class]['extends'])) {
+    $classDefinition = $classDefinitions[$class];
+
+    if (!isset($classDefinition['methods']['instance'][$scope][$method])) {
+        if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
-            $parentObjectData['class'] = $classDefinitions[$class]['extends'];
+            $parentObjectData['class'] = $classDefinition['extends'];
             if ($scope === 'private') {
                 $parentScope = 'protected';
             } else {
@@ -54,12 +56,12 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
         }
     }
 
-    if (!$classDefinitions[$class]['loaded']) {
-        require_once $classDefinitions[$class]['ƒile_path'];
+    if (!$classDefinition['loaded']) {
+        require_once $classDefinition['ƒile_path'];
         $classDefinitions[$class]['loaded'] = true;
     }
 
-    $functionName = $classDefinitions[$class]['namespace'] . '\\' .
+    $functionName = $classDefinition['namespace'] . '\\' .
         'Class' . str_replace('\\', '_', $objectData['class'])
         . 'Instance' . ucfirst($scope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, $parameters);
