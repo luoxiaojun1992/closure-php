@@ -3,6 +3,53 @@
 namespace Lxj\ClosurePHP\Sugars\Object;
 
 /**
+ * @param $objectData
+ * @param $propName
+ * @param string $scope
+ * @return null
+ * @throws \Exception
+ */
+function accessObjectProp($objectData, $propName, $scope = 'public')
+{
+    global $classDefinitions;
+
+    $class = $objectData['class'];
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    $classDefinition = $classDefinitions[$class];
+
+    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+        if (isset($classDefinition['extends'])) {
+            $parentObjectData = $objectData;
+            $parentObjectData['class'] = $classDefinition['extends'];
+            if ($scope === 'private') {
+                $parentScope = 'protected';
+            } else {
+                $parentScope = $scope;
+            }
+            return accessObjectProp($parentObjectData, $propName, $parentScope);
+        } else {
+            return null;
+        }
+    }
+
+    if (!$classDefinition['loaded']) {
+        require_once $classDefinition['ƒile_path'];
+        $classDefinitions[$class]['loaded'] = true;
+    }
+
+    $varName = 'Class' . ucfirst(str_replace('\\', '_', $class)) .
+        'Instance' .
+        ucfirst($scope) . 'Prop' . ucfirst($propName);
+
+    global $$varName;
+    return $$varName;
+}
+
+/**
  * @param $class
  * @param string $scope
  * @param array $constructParameters
@@ -23,8 +70,8 @@ function newObject($class, $scope = 'public', $constructParameters = [])
         'class' => $class,
     ];
 
-    $method = '__construct';
-    if (!isset($classDefinition['methods']['instance'][$scope][$method])) {
+    $constructMethod = '__construct';
+    if (!isset($classDefinition['methods']['instance'][$scope][$constructMethod])) {
         return $objectData;
     }
 
@@ -41,7 +88,7 @@ function newObject($class, $scope = 'public', $constructParameters = [])
  * @return mixed
  * @throws \Exception
  */
-function callStaticObjectMethod($objectData, $method, $scope, $parameters = []) {
+function callStaticObjectMethod($objectData, $method, $scope = 'public', $parameters = []) {
     return callObjectMethod($objectData, $method, $scope, $parameters, true);
 }
 
@@ -54,7 +101,7 @@ function callStaticObjectMethod($objectData, $method, $scope, $parameters = []) 
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod($objectData, $method, $scope, $parameters = [], $isStatic = false)
+function callObjectMethod($objectData, $method, $scope = 'public', $parameters = [], $isStatic = false)
 {
     global $classDefinitions;
 

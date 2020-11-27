@@ -75,7 +75,6 @@ $classDefinitions = array (
                                             'scope' => 'public',
                                             'is_static' => true,
                                             'name' => 'barPubStatAttr',
-                                            'default' => 'bar_pub_stat_attr',
                                         ),
                                 ),
                         ),
@@ -117,7 +116,6 @@ $classDefinitions = array (
                             0 =>
                                 array (
                                     'name' => 'BAR_CONST',
-                                    'value' => 'bar_const',
                                 ),
                         ),
                 ),
@@ -141,6 +139,8 @@ $classDefinitions = array (
         ),
 );
 
-$fooObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
-echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($fooObj, 'helloFoo', 'public'), PHP_EOL;
-echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($fooObj, 'helloBar', 'public'), PHP_EOL;
+$barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
+echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloFoo', 'public'), PHP_EOL;
+echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloBar', 'public'), PHP_EOL;
+var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));

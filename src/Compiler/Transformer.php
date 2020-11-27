@@ -165,23 +165,21 @@ class Transformer
                     }
                     $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
 
-                    if ($propertyInfo['is_static']) {
-                        $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
-                            ucfirst($propertyStaticOrInstance) .
-                            ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
-                        $varDeclareStmt = new Global_([
-                            new Variable($varName)
-                        ]);
-                        $fileStmts[] = $varDeclareStmt;
-                        if (array_key_exists('default', $propertyInfo)) {
-                            $varAssignStmt = new Expression(
-                                new Assign(
-                                    new Variable($varName),
-                                    $propertyInfo['default']
-                                )
-                            );
-                            $fileStmts[] = $varAssignStmt;
-                        }
+                    $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                        ucfirst($propertyStaticOrInstance) .
+                        ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
+                    $varDeclareStmt = new Global_([
+                        new Variable($varName)
+                    ]);
+                    $fileStmts[] = $varDeclareStmt;
+                    if (array_key_exists('default', $propertyInfo)) {
+                        $varAssignStmt = new Expression(
+                            new Assign(
+                                new Variable($varName),
+                                $propertyInfo['default']
+                            )
+                        );
+                        $fileStmts[] = $varAssignStmt;
                     }
                 }
             }

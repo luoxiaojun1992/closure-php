@@ -8,7 +8,7 @@ class Bar extends Foo
 
     public static $barPubStatAttr = 'bar_pub_stat_attr';
 
-    public $barPubAttr;
+    public $barPubAttr = 'bar_pub_attr';
 
     protected $barProAttr;
 

@@ -4,7 +4,7 @@ namespace Lxj\ClosurePHP\Demo;
 
 class Foo
 {
-    public $fooPubAttr;
+    public $fooPubAttr = 'foo_pub_attr';
 
 	protected $fooProAttr;
 
