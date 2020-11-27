@@ -161,8 +161,7 @@ class Transformer
                     $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
                     $litePropertyInfo = $propertyInfo;
                     if (array_key_exists('default', $propertyInfo)) {
-                        //todo value is array
-                        $litePropertyInfo['default'] = $propertyInfo['default']->value;
+                        unset($litePropertyInfo['default']);
                     }
                     $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
 
@@ -190,7 +189,7 @@ class Transformer
             if (isset($classInfo['consts'])) {
                 foreach ($classInfo['consts'] as $constName => $constInfo) {
                     $liteConstInfo = $constInfo;
-                    $liteConstInfo['value'] = $constInfo['value']->value;
+                    unset($liteConstInfo['value']);
                     $classDefinition['consts'][$constName][] = $liteConstInfo;
 
                     $constVarName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
