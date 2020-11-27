@@ -2,10 +2,14 @@
 
 namespace Lxj\ClosurePHP\Compiler;
 
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Stmt\Global_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Use_;
@@ -62,18 +66,19 @@ class Transformer
                                 $propertyScope = 'protected';
                             } elseif ($propertyStmt->isPrivate()) {
                                 $propertyScope = 'private';
-                            } elseif ($propertyStmt->isStatic()) {
-                                $propertyScope = 'static';
                             } else {
                                 $propertyScope = 'unknown';
                             }
 
+                            $propertyIsStatic = $propertyStmt->isStatic();
+
                             foreach ($propertyStmt->props as $propertyPropStmt) {
                                 $propertyInfo  = [];
                                 $propertyInfo['scope'] = $propertyScope;
+                                $propertyInfo['is_static'] = $propertyIsStatic;
                                 $propertyInfo['name'] = $propertyPropStmt->name->name;
                                 if ($propertyPropStmt->default) {
-                                    $propertyInfo['default'] = $propertyPropStmt->default->value;
+                                    $propertyInfo['default'] = $propertyPropStmt->default;
                                 }
                                 $classInfo['props'][$propertyInfo['name']] = $propertyInfo;
                             }
@@ -137,11 +142,36 @@ class Transformer
                 $fileStmts[] = $classInfo['useStmt'];
             }
 
+            foreach ($classInfo['props'] as $propertyName => $propertyInfo) {
+                $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
+                $litePropertyInfo = $propertyInfo;
+                if (array_key_exists('default', $propertyInfo)) {
+                    $litePropertyInfo['default'] = $propertyInfo['default']->value;
+                }
+                $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyInfo['name']] = $litePropertyInfo;
+
+                if ($propertyInfo['is_static']) {
+                    $varDeclareStmt = new Global_([
+                        new Variable($propertyInfo['name'])
+                    ]);
+                    $fileStmts[] = $varDeclareStmt;
+                    if (array_key_exists('default', $propertyInfo)) {
+                        $varAssignStmt = new Expression(
+                            new Assign(
+                                new Variable($propertyInfo['name']),
+                                $propertyInfo['default']
+                            )
+                        );
+                        $fileStmts[] = $varAssignStmt;
+                    }
+                }
+            }
+
             foreach ($classInfo['methods'] as $methodName => $methodInfo) {
-                $staticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
+                $methodStaticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
                 $liteMethodInfo = $methodInfo;
                 unset($liteMethodInfo['stmts']);
-                $classDefinition['methods'][$staticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
+                $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
 
                 $functionStmt = new Function_(
                     'Class' . ucfirst(str_replace('\\', '_', $className)) .
