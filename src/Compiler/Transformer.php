@@ -115,7 +115,7 @@ class Transformer
      * @param Namespace_[] $ast
      * @return mixed
      */
-    public function transform($ast)
+    public function transform(array $ast)
     {
         $allClassInfo = $this->parseClassInfo($ast);
 
@@ -125,6 +125,7 @@ class Transformer
 
         foreach ($allClassInfo as $className => $classInfo) {
             $classDefinition = [
+                'loaded' => false,
                 'file' => $classInfo['realName'] . '.php',
             ];
 
@@ -151,15 +152,32 @@ class Transformer
                 $fileStmts[] = $functionStmt;
             }
 
-            $classDefinitions[$classInfo['name']] = $classDefinition;
+            if (isset($classInfo['extends'])) {
+                $extendClass = $classInfo['extends'];
+                if (count($extendClass) > 1) {
+                    $extendClassName = implode('\\', $extendClass);
+                } else {
+                    if (isset($classInfo['uses'])) {
+                        if (isset($classInfo['uses'][$extendClass[0]])) {
+                            $extendClassName = $classInfo['uses'][$extendClass[0]]['name'];
+                        } else {
+                            $extendClassName = $classInfo['namespace'] . '\\' . $extendClass[0];
+                        }
+                    } else {
+                        $extendClassName = $classInfo['namespace'] . '\\' . $extendClass[0];
+                    }
+                }
+
+                $classDefinition['extends'] = $extendClassName;
+            }
+
+            $classDefinitions[$className] = $classDefinition;
 
             $namespaceStmt->stmts = $fileStmts;
 
-            $transformedAst[] = $namespaceStmt;
+            $transformedAst[$className] = $namespaceStmt;
         }
 
-        var_dump($classDefinitions);
-
-        return $transformedAst;
+        return [$classDefinitions, $transformedAst];
     }
 }

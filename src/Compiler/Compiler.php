@@ -19,8 +19,12 @@ class Compiler
     public function compile($classCode)
     {
         $ast = $this->parseAst($classCode);
-        $transformedAst = $this->transform($ast);
-        return $this->generateCode($transformedAst);
+        list($classDefinitions, $transformedAst) = $this->transform($ast);
+        $transformedCode = [];
+        foreach ($transformedAst as $className => $transformedClassAst) {
+            $transformedCode[$className] = $this->generateCode([$transformedClassAst]);
+        }
+        return [$classDefinitions, $transformedCode];
     }
 
     protected function removePHPTag($code)
