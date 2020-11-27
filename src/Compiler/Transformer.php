@@ -3,9 +3,12 @@
 namespace Lxj\ClosurePHP\Compiler;
 
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Function_;
@@ -57,7 +60,16 @@ class Transformer
                     $classBodyStmts = $classDefineStmt->stmts;
 
                     foreach ($classBodyStmts as $classBodyStmt) {
-                        if ($classBodyStmt instanceof Property) {
+                        if ($classBodyStmt instanceof ClassConst) {
+                            $constStmt = $classBodyStmt;
+
+                            foreach ($constStmt->consts as $constConstStmt) {
+                                $constInfo  = [];
+                                $constInfo['name'] = $constConstStmt->name->name;
+                                $constInfo['value'] = $constConstStmt->value;
+                                $classInfo['consts'][$constInfo['name']] = $constInfo;
+                            }
+                        } elseif ($classBodyStmt instanceof Property) {
                             $propertyStmt = $classBodyStmt;
 
                             if ($propertyStmt->isPublic()) {
@@ -138,48 +150,75 @@ class Transformer
             $namespaceStmt->name = (new Name($classInfo['namespace']));
 
             $fileStmts = [];
+
             if (isset($classInfo['useStmt'])) {
                 $fileStmts[] = $classInfo['useStmt'];
             }
 
-            foreach ($classInfo['props'] as $propertyName => $propertyInfo) {
-                $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
-                $litePropertyInfo = $propertyInfo;
-                if (array_key_exists('default', $propertyInfo)) {
-                    $litePropertyInfo['default'] = $propertyInfo['default']->value;
-                }
-                $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyInfo['name']] = $litePropertyInfo;
-
-                if ($propertyInfo['is_static']) {
-                    $varDeclareStmt = new Global_([
-                        new Variable($propertyInfo['name'])
-                    ]);
-                    $fileStmts[] = $varDeclareStmt;
+            if (isset($classInfo['props'])) {
+                foreach ($classInfo['props'] as $propertyName => $propertyInfo) {
+                    $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
+                    $litePropertyInfo = $propertyInfo;
                     if (array_key_exists('default', $propertyInfo)) {
-                        $varAssignStmt = new Expression(
-                            new Assign(
-                                new Variable($propertyInfo['name']),
-                                $propertyInfo['default']
-                            )
-                        );
-                        $fileStmts[] = $varAssignStmt;
+                        //todo value is array
+                        $litePropertyInfo['default'] = $propertyInfo['default']->value;
+                    }
+                    $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
+
+                    if ($propertyInfo['is_static']) {
+                        $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                            ucfirst($propertyStaticOrInstance) .
+                            ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
+                        $varDeclareStmt = new Global_([
+                            new Variable($varName)
+                        ]);
+                        $fileStmts[] = $varDeclareStmt;
+                        if (array_key_exists('default', $propertyInfo)) {
+                            $varAssignStmt = new Expression(
+                                new Assign(
+                                    new Variable($varName),
+                                    $propertyInfo['default']
+                                )
+                            );
+                            $fileStmts[] = $varAssignStmt;
+                        }
                     }
                 }
             }
 
-            foreach ($classInfo['methods'] as $methodName => $methodInfo) {
-                $methodStaticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
-                $liteMethodInfo = $methodInfo;
-                unset($liteMethodInfo['stmts']);
-                $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
+            if (isset($classInfo['consts'])) {
+                foreach ($classInfo['consts'] as $constName => $constInfo) {
+                    $liteConstInfo = $constInfo;
+                    $liteConstInfo['value'] = $constInfo['value']->value;
+                    $classDefinition['consts'][$constName][] = $liteConstInfo;
 
-                $functionStmt = new Function_(
-                    'Class' . ucfirst(str_replace('\\', '_', $className)) .
-                    ($methodInfo['is_static'] ? 'Static' : 'Instance') .
-                    ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName)
-                );
-                $functionStmt->stmts = $methodInfo['stmts'];
-                $fileStmts[] = $functionStmt;
+                    $constVarName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                        'Const' . ucfirst($constName);
+                    $constVarDefineStmt = new Expression(
+                        new FuncCall(
+                            new Name('define'),
+                            [new String_($constVarName), $constInfo['value']]
+                        )
+                    );
+                    $fileStmts[] = $constVarDefineStmt;
+                }
+            }
+
+            if (isset($classInfo['methods'])) {
+                foreach ($classInfo['methods'] as $methodName => $methodInfo) {
+                    $methodStaticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
+                    $liteMethodInfo = $methodInfo;
+                    unset($liteMethodInfo['stmts']);
+                    $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
+
+                    $functionStmt = new Function_(
+                        'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                        ucfirst($methodStaticOrInstance) .
+                        ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName)
+                    );
+                    $functionStmt->stmts = $methodInfo['stmts'];
+                    $fileStmts[] = $functionStmt;
+                }
             }
 
             if (isset($classInfo['extends'])) {
