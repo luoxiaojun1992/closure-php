@@ -4,11 +4,12 @@ namespace Lxj\ClosurePHP\Sugars\Object;
 
 /**
  * @param $class
+ * @param string $scope
  * @param array $constructParameters
  * @return array
  * @throws \Exception
  */
-function newObject($class, $constructParameters = [])
+function newObject($class, $scope = 'public', $constructParameters = [])
 {
     global $classDefinitions;
 
@@ -16,9 +17,20 @@ function newObject($class, $constructParameters = [])
         throw new \Exception('Class ' . $class . ' not existed');
     }
 
-    return [
-        'class' => $class
+    $classDefinition = $classDefinitions[$class];
+
+    $objectData = [
+        'class' => $class,
     ];
+
+    $method = '__construct';
+    if (!isset($classDefinition['methods']['instance'][$scope][$method])) {
+        return $objectData;
+    }
+
+    callObjectMethod($objectData, '__construct', $scope, $constructParameters, false);
+
+    return $objectData;
 }
 
 /**
@@ -29,7 +41,20 @@ function newObject($class, $constructParameters = [])
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod($objectData, $method, $scope, $parameters = [])
+function callStaticObjectMethod($objectData, $method, $scope, $parameters = []) {
+    return callObjectMethod($objectData, $method, $scope, $parameters, true);
+}
+
+/**
+ * @param $objectData
+ * @param $method
+ * @param $scope
+ * @param array $parameters
+ * @param false $isStatic
+ * @return mixed
+ * @throws \Exception
+ */
+function callObjectMethod($objectData, $method, $scope, $parameters = [], $isStatic = false)
 {
     global $classDefinitions;
 
@@ -41,7 +66,9 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
 
     $classDefinition = $classDefinitions[$class];
 
-    if (!isset($classDefinition['methods']['instance'][$scope][$method])) {
+    $staticOrInstance = $isStatic ? 'static' : 'instance';
+
+    if (!isset($classDefinition['methods'][$staticOrInstance][$scope][$method])) {
         if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
             $parentObjectData['class'] = $classDefinition['extends'];
@@ -63,6 +90,6 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
 
     $functionName = $classDefinition['namespace'] . '\\' .
         'Class' . str_replace('\\', '_', $objectData['class'])
-        . 'Instance' . ucfirst($scope) . 'Func' . ucfirst($method);
-    return call_user_func_array($functionName, $parameters);
+        . ucfirst($staticOrInstance) . ucfirst($scope) . 'Func' . ucfirst($method);
+    return call_user_func_array($functionName, array_merge($parameters, [$objectData]));
 }
