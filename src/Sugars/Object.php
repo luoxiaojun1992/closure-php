@@ -196,7 +196,10 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
             } else {
                 $parentScope = $scope;
             }
-            return callObjectMethod($parentObjectData, $method, $parentScope, $parameters, $isStatic, $originObjectData ?: $objectData);
+            return callObjectMethod(
+                $parentObjectData, $method, $parentScope, $parameters, $isStatic,
+                $originObjectData ?: $objectData
+            );
         } else {
             throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
         }
