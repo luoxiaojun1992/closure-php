@@ -14,16 +14,36 @@ class Compiler
         $this->transformer = $transformer ?: (new Transformer());
     }
 
-    public function compile($code)
+    public function compile($classCode)
     {
-        $ast = $this->parseAst($code);
+        $ast = $this->parseAst($classCode);
         $transformedAst = $this->transform($ast);
         return $this->generateCode($transformedAst);
     }
 
-    public function compilePath($filePath)
+    public function compilePath($fileOrDir)
     {
-        return $this->compile(file_get_contents($filePath));
+        $classCodeArr = [];
+
+        if (is_dir($fileOrDir)) {
+            $fd = opendir($fileOrDir);
+            while ($subFileOrDir = readdir($fd)) {
+                if (!in_array($subFileOrDir, ['.', '..'])) {
+                    $filePath = $fileOrDir . '/' . $subFileOrDir;
+                    $classCodeArr[] = file_get_contents($filePath);
+                }
+            }
+            closedir($fd);
+        } else {
+            $classCodeArr[] = file_get_contents($fileOrDir);
+        }
+
+        $this->compile(implode(
+            str_repeat(PHP_EOL, 2),
+            $classCodeArr
+        ));
+
+        return $this;
     }
 
     protected function parseAst($code)
