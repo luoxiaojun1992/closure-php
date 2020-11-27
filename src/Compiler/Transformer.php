@@ -144,6 +144,7 @@ class Transformer
             $classDefinition = [
                 'loaded' => false,
                 'file' => $classInfo['realName'] . '.php',
+                'namespace' => $classInfo['namespace'],
             ];
 
             $namespaceStmt = new Namespace_();

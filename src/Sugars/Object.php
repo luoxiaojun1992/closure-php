@@ -39,15 +39,28 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
         throw new \Exception('Class ' . $class . ' not existed');
     }
 
+    if (!isset($classDefinitions[$class]['methods']['instance'][$scope][$method])) {
+        if (isset($classDefinitions[$class]['extends'])) {
+            $parentObjectData = $objectData;
+            $parentObjectData['class'] = $classDefinitions[$class]['extends'];
+            if ($scope === 'private') {
+                $parentScope = 'protected';
+            } else {
+                $parentScope = $scope;
+            }
+            return callObjectMethod($parentObjectData, $method, $parentScope, $parameters);
+        } else {
+            throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
+        }
+    }
+
     if (!$classDefinitions[$class]['loaded']) {
-        require_once $classDefinitions[$class]['file'];
+        require_once $classDefinitions[$class]['ƒile_path'];
         $classDefinitions[$class]['loaded'] = true;
     }
 
-    if (!isset($classDefinitions[$class]['methods'][$scope][$method])) {
-        throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
-    }
-
-    $functionName = 'Class' . $objectData['class'] . 'Instance' . ucfirst($scope) . 'Func' . ucfirst($method);
+    $functionName = $classDefinitions[$class]['namespace'] . '\\' .
+        'Class' . str_replace('\\', '_', $objectData['class'])
+        . 'Instance' . ucfirst($scope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, $parameters);
 }

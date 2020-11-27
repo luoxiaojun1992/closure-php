@@ -2,9 +2,7 @@
 
 namespace Lxj\ClosurePHP\Demo;
 
-use Lxj\ClosurePHP\Compiler\Compiler;
-
-class Bar extends Compiler
+class Bar extends Foo
 {
     const BAR_CONST = 'bar_const';
 
