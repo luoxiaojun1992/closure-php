@@ -1,6 +1,6 @@
 <?php
 
-function ClassFooFuncPublicHello()
+function ClassFooInstancePublicFuncHello()
 {
 	return 'Foo';
 }

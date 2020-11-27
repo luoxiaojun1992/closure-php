@@ -48,6 +48,6 @@ function callObjectMethod($objectData, $method, $scope, $parameters = [])
         throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
     }
 
-    $functionName = 'Class' . $objectData['class'] . 'Func' . ucfirst($scope) . ucfirst($method);
+    $functionName = 'Class' . $objectData['class'] . 'Instance' . ucfirst($scope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, $parameters);
 }

@@ -1,11 +1,17 @@
 <?php
 
+namespace Lxj\ClosurePHP\Demo;
+
 class Foo
 {
-	protected $name;
+    public $fooPubAttr;
 
-	function hello()
+	protected $fooProAttr;
+
+	private $fooPriAttr;
+
+	function helloFoo()
 	{
 		return 'Foo';
-	}	
+	}
 }

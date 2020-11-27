@@ -2,6 +2,8 @@
 
 namespace Lxj\ClosurePHP\Compiler;
 
+use PhpParser\PrettyPrinter\Standard;
+
 class Compiler
 {
     protected $parser;
@@ -21,6 +23,11 @@ class Compiler
         return $this->generateCode($transformedAst);
     }
 
+    protected function removePHPTag($code)
+    {
+        return substr(ltrim($code), 5);
+    }
+
     public function compilePath($fileOrDir)
     {
         $classCodeArr = [];
@@ -30,20 +37,21 @@ class Compiler
             while ($subFileOrDir = readdir($fd)) {
                 if (!in_array($subFileOrDir, ['.', '..'])) {
                     $filePath = $fileOrDir . '/' . $subFileOrDir;
-                    $classCodeArr[] = file_get_contents($filePath);
+                    $classCodeArr[] = $this->removePHPTag(file_get_contents($filePath));
                 }
             }
             closedir($fd);
         } else {
-            $classCodeArr[] = file_get_contents($fileOrDir);
+            $classCodeArr[] = $this->removePHPTag(file_get_contents($fileOrDir));
         }
 
-        $this->compile(implode(
-            str_repeat(PHP_EOL, 2),
-            $classCodeArr
-        ));
-
-        return $this;
+        return $this->compile(
+            '<?php' . str_repeat(PHP_EOL, 2) .
+            implode(
+                str_repeat(PHP_EOL, 2),
+                $classCodeArr
+            )
+        );
     }
 
     protected function parseAst($code)
@@ -58,6 +66,6 @@ class Compiler
 
     protected function generateCode($ast)
     {
-        return '';
+        return (new Standard())->prettyPrintFile($ast);
     }
 }
