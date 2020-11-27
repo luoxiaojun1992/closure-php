@@ -81,6 +81,44 @@ function accessObjectProp($objectData, $propName, $scope = 'public')
 }
 
 /**
+ * @param $objectData
+ * @return mixed
+ * @throws \Exception
+ */
+function setObjectPropDefaultValue($objectData)
+{
+    global $classDefinitions;
+
+    $class = $objectData['class'];
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    $classDefinition = $classDefinitions[$class];
+
+    if (isset($classDefinition['props']['instance'])) {
+        foreach ($classDefinition['props']['instance'] as $scopeProps) {
+            foreach ($scopeProps as $propInfo) {
+                if (array_key_exists('default', $propInfo)) {
+                    $objectData['props'][$propInfo['name']] = $propInfo['default'];
+                }
+            }
+        }
+    }
+
+    if (isset($classDefinition['extends'])) {
+        $parentObjectData = $objectData;
+        $parentObjectData['class'] = $classDefinition['extends'];
+        $newObjectData = setObjectPropDefaultValue($parentObjectData);
+        $newObjectData['class'] = $objectData['class'];
+        return $newObjectData;
+    }
+
+    return $objectData;
+}
+
+/**
  * @param $class
  * @param string $scope
  * @param array $constructParameters
@@ -101,16 +139,7 @@ function newObject($class, $scope = 'public', $constructParameters = [])
         'class' => $class,
     ];
 
-    if (isset($classDefinition['props']['instance'])) {
-        foreach ($classDefinition['props']['instance'] as $scopeProps) {
-            foreach ($scopeProps as $propInfo) {
-                if (array_key_exists('default', $propInfo)) {
-                    $objectData['props'][$propInfo['name']] = $propInfo['default'];
-                }
-                //todo bugfix parent default value
-            }
-        }
-    }
+    $objectData = setObjectPropDefaultValue($objectData);
 
     $constructMethod = '__construct';
     if (!isset($classDefinition['methods']['instance'][$scope][$constructMethod])) {
