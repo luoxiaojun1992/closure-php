@@ -16,6 +16,7 @@ use PhpParser\Node\Stmt\Global_;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Use_;
+use PhpParser\PrettyPrinter\Standard;
 
 class Transformer
 {
@@ -161,25 +162,32 @@ class Transformer
                     $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
                     $litePropertyInfo = $propertyInfo;
                     if (array_key_exists('default', $propertyInfo)) {
-                        unset($litePropertyInfo['default']);
+                        $propertyDefaultVal = (new Standard())->prettyPrintExpr($propertyInfo['default']);
+                        if (is_string($propertyDefaultVal)) {
+                            $litePropertyInfo['default'] = trim($propertyDefaultVal, '\'');
+                        } else {
+                            $litePropertyInfo['default'] = $propertyDefaultVal;
+                        }
                     }
                     $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
 
-                    $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
-                        ucfirst($propertyStaticOrInstance) .
-                        ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
-                    $varDeclareStmt = new Global_([
-                        new Variable($varName)
-                    ]);
-                    $fileStmts[] = $varDeclareStmt;
-                    if (array_key_exists('default', $propertyInfo)) {
-                        $varAssignStmt = new Expression(
-                            new Assign(
-                                new Variable($varName),
-                                $propertyInfo['default']
-                            )
-                        );
-                        $fileStmts[] = $varAssignStmt;
+                    if ($propertyInfo['is_static']) {
+                        $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                            ucfirst($propertyStaticOrInstance) .
+                            ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
+                        $varDeclareStmt = new Global_([
+                            new Variable($varName)
+                        ]);
+                        $fileStmts[] = $varDeclareStmt;
+                        if (array_key_exists('default', $propertyInfo)) {
+                            $varAssignStmt = new Expression(
+                                new Assign(
+                                    new Variable($varName),
+                                    $propertyInfo['default']
+                                )
+                            );
+                            $fileStmts[] = $varAssignStmt;
+                        }
                     }
                 }
             }

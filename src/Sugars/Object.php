@@ -5,6 +5,47 @@ namespace Lxj\ClosurePHP\Sugars\Object;
 /**
  * @param $objectData
  * @param $propName
+ * @param $value
+ * @param string $scope
+ * @return mixed
+ * @throws \Exception
+ */
+function setObjectProp($objectData, $propName, $value, $scope = 'public')
+{
+    global $classDefinitions;
+
+    $class = $objectData['class'];
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    $classDefinition = $classDefinitions[$class];
+
+    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+        if (isset($classDefinition['extends'])) {
+            $parentObjectData = $objectData;
+            $parentObjectData['class'] = $classDefinition['extends'];
+            if ($scope === 'private') {
+                $parentScope = 'protected';
+            } else {
+                $parentScope = $scope;
+            }
+            $newObjectData = setObjectProp($parentObjectData, $propName, $value, $parentScope);
+            $newObjectData['class'] = $objectData['class'];
+            return $newObjectData;
+        } else {
+            return $objectData;
+        }
+    }
+
+    $objectData['props'][$propName] = $value;
+    return $objectData;
+}
+
+/**
+ * @param $objectData
+ * @param $propName
  * @param string $scope
  * @return null
  * @throws \Exception
@@ -36,17 +77,7 @@ function accessObjectProp($objectData, $propName, $scope = 'public')
         }
     }
 
-    if (!$classDefinition['loaded']) {
-        require_once $classDefinition['ƒile_path'];
-        $classDefinitions[$class]['loaded'] = true;
-    }
-
-    $varName = 'Class' . ucfirst(str_replace('\\', '_', $class)) .
-        'Instance' .
-        ucfirst($scope) . 'Prop' . ucfirst($propName);
-
-    global $$varName;
-    return $$varName;
+    return $objectData['props'][$propName] ?? null;
 }
 
 /**
@@ -69,6 +100,17 @@ function newObject($class, $scope = 'public', $constructParameters = [])
     $objectData = [
         'class' => $class,
     ];
+
+    if (isset($classDefinition['props']['instance'])) {
+        foreach ($classDefinition['props']['instance'] as $scopeProps) {
+            foreach ($scopeProps as $propInfo) {
+                if (array_key_exists('default', $propInfo)) {
+                    $objectData['props'][$propInfo['name']] = $propInfo['default'];
+                }
+                //todo bugfix parent default value
+            }
+        }
+    }
 
     $constructMethod = '__construct';
     if (!isset($classDefinition['methods']['instance'][$scope][$constructMethod])) {
