@@ -32,7 +32,7 @@ function setObjectProp($objectData, $propName, $value, $scope = 'public')
                 $parentScope = $scope;
             }
             $newObjectData = setObjectProp($parentObjectData, $propName, $value, $parentScope);
-            $newObjectData['class'] = $objectData['class'];
+            $newObjectData['class'] = $class;
             return $newObjectData;
         } else {
             return $objectData;
@@ -111,7 +111,7 @@ function setObjectPropDefaultValue($objectData)
         $parentObjectData = $objectData;
         $parentObjectData['class'] = $classDefinition['extends'];
         $newObjectData = setObjectPropDefaultValue($parentObjectData);
-        $newObjectData['class'] = $objectData['class'];
+        $newObjectData['class'] = $class;
         return $newObjectData;
     }
 
@@ -166,13 +166,14 @@ function callStaticObjectMethod($objectData, $method, $scope = 'public', $parame
 /**
  * @param $objectData
  * @param $method
- * @param $scope
+ * @param string $scope
  * @param array $parameters
  * @param false $isStatic
+ * @param null $originObjectData
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod($objectData, $method, $scope = 'public', $parameters = [], $isStatic = false)
+function callObjectMethod($objectData, $method, $scope = 'public', $parameters = [], $isStatic = false, $originObjectData = null)
 {
     global $classDefinitions;
 
@@ -195,7 +196,7 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
             } else {
                 $parentScope = $scope;
             }
-            return callObjectMethod($parentObjectData, $method, $parentScope, $parameters);
+            return callObjectMethod($parentObjectData, $method, $parentScope, $parameters, $isStatic, $originObjectData ?: $objectData);
         } else {
             throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
         }
@@ -209,5 +210,5 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
     $functionName = $classDefinition['namespace'] . '\\' .
         'Class' . str_replace('\\', '_', $objectData['class'])
         . ucfirst($staticOrInstance) . ucfirst($scope) . 'Func' . ucfirst($method);
-    return call_user_func_array($functionName, array_merge($parameters, [$objectData]));
+    return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
 }
