@@ -151,3 +151,11 @@ var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', '
 \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public');
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
+\Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
+    $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
+}, 'public');
+\Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
+    $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
+}, 'public');
+var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));

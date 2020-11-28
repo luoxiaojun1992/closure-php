@@ -2,12 +2,40 @@
 
 namespace Lxj\ClosurePHP\Sugars\Object;
 
+function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
+{
+    global $classDefinitions;
+
+    $class = $objectData['class'];
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    $classDefinition = $classDefinitions[$class];
+
+    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+        if (isset($classDefinition['extends'])) {
+            $currentClass = $objectData['class'];
+            $objectData['class'] = $classDefinition['extends'];
+            if ($scope === 'private') {
+                $parentScope = 'protected';
+            } else {
+                $parentScope = $scope;
+            }
+            modifyObjectProp($objectData, $propName, $callback, $parentScope);
+            $objectData['class'] = $currentClass;
+        }
+    } else {
+        $callback($objectData);
+    }
+}
+
 /**
  * @param $objectData
  * @param $propName
  * @param $value
  * @param string $scope
- * @return mixed
  * @throws \Exception
  */
 function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
