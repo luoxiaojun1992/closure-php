@@ -10,7 +10,7 @@ namespace Lxj\ClosurePHP\Sugars\Object;
  * @return mixed
  * @throws \Exception
  */
-function setObjectProp($objectData, $propName, $value, $scope = 'public')
+function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
 {
     global $classDefinitions;
 
@@ -24,23 +24,19 @@ function setObjectProp($objectData, $propName, $value, $scope = 'public')
 
     if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
         if (isset($classDefinition['extends'])) {
-            $parentObjectData = $objectData;
-            $parentObjectData['class'] = $classDefinition['extends'];
+            $currentClass = $objectData['class'];
+            $objectData['class'] = $classDefinition['extends'];
             if ($scope === 'private') {
                 $parentScope = 'protected';
             } else {
                 $parentScope = $scope;
             }
-            $newObjectData = setObjectProp($parentObjectData, $propName, $value, $parentScope);
-            $newObjectData['class'] = $class;
-            return $newObjectData;
-        } else {
-            return $objectData;
+            setObjectProp($objectData, $propName, $value, $parentScope);
+            $objectData['class'] = $currentClass;
         }
+    } else {
+        $objectData['props'][$propName] = $value;
     }
-
-    $objectData['props'][$propName] = $value;
-    return $objectData;
 }
 
 /**

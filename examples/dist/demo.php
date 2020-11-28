@@ -147,7 +147,7 @@ echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloFoo', 'public
 echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloBar', 'public'), PHP_EOL;
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
-$barObj = \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'barPubAttr', 'bar_pub_attr_new', 'public');
-$barObj = \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public');
+\Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'barPubAttr', 'bar_pub_attr_new', 'public');
+\Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public');
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
 var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
