@@ -2,6 +2,7 @@
 
 namespace Lxj\ClosurePHP\Compiler;
 
+use Lxj\ClosurePHP\Sugars\Scope;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
@@ -74,7 +75,7 @@ class Transformer
                             $propertyStmt = $classBodyStmt;
 
                             if ($propertyStmt->isPublic()) {
-                                $propertyScope = 'public';
+                                $propertyScope = Scope::PUBLIC;
                             } elseif ($propertyStmt->isProtected()) {
                                 $propertyScope = 'protected';
                             } elseif ($propertyStmt->isPrivate()) {
