@@ -62,8 +62,12 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
             \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public')
         );
 
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'barPubAttr', 'bar_pub_attr_new', 'public');
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public');
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+            $barObj, 'barPubAttr', 'bar_pub_attr_new', 'public'
+        );
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+            $barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public'
+        );
 
         $this->assertEquals(
             'bar_pub_attr_new',
