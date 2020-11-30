@@ -2,6 +2,13 @@
 
 namespace Lxj\ClosurePHP\Sugars\Object;
 
+/**
+ * @param $objectData
+ * @param $propName
+ * @param $callback
+ * @param string $scope
+ * @throws \Exception
+ */
 function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
 {
     global $classDefinitions;
