@@ -10,8 +10,18 @@ class Foo
 
 	private $fooPriAttr;
 
-	function helloFoo()
+	public function helloPubFoo()
 	{
-		return 'Foo';
+		return 'Pub Foo';
 	}
+
+    protected function helloProFoo()
+    {
+        return 'Pro Foo';
+    }
+
+    private function helloPriFoo()
+    {
+        return 'Pri Foo';
+    }
 }

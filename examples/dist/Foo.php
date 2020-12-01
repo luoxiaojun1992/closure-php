@@ -2,7 +2,15 @@
 
 namespace Lxj\ClosurePHP\Demo;
 
-function ClassLxj_ClosurePHP_Demo_FooInstancePublicFuncHelloFoo()
+function ClassLxj_ClosurePHP_Demo_FooInstancePublicFuncHelloPubFoo()
 {
-    return 'Foo';
+    return 'Pub Foo';
+}
+function ClassLxj_ClosurePHP_Demo_FooInstanceProtectedFuncHelloProFoo()
+{
+    return 'Pro Foo';
+}
+function ClassLxj_ClosurePHP_Demo_FooInstancePrivateFuncHelloPriFoo()
+{
+    return 'Pri Foo';
 }

@@ -33,7 +33,7 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
     /**
      * @throws Exception
      */
-    public function testCompileAndCallMethod()
+    public function testPublicMethodsAndProps()
     {
         $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
         if (!is_dir($compiledCodeDir)) {
@@ -54,18 +54,18 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
 
         foreach ($testScopes as $scope) {
             $this->assertEquals(
-                'Foo',
+                'Pub Foo',
                 \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
                     $barObj,
-                    'helloFoo',
+                    'helloPubFoo',
                     $scope
                 )
             );
             $this->assertEquals(
-                'Bar',
+                'Pub Bar',
                 \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
                     $barObj,
-                    'helloBar',
+                    'helloPubBar',
                     $scope
                 )
             );
@@ -154,7 +154,10 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAccessPrivateProp()
+    /**
+     * @throws Exception
+     */
+    public function testProtectedMethodsAndProps()
     {
         $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
         if (!is_dir($compiledCodeDir)) {
@@ -167,18 +170,192 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
 
         $barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
 
-        $this->assertNull(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+        $this->assertEquals(
+            'Pro Bar',
+            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                $barObj,
+                'helloProBar',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+        $this->assertEquals(
+            'Pro Foo',
+            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                $barObj,
+                'helloProFoo',
+                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
+            )
+        );
+        $this->assertEquals(
+            'Pro Foo',
+            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                $barObj,
+                'helloProFoo',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+
+        $this->assertNull(
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+        $this->assertNull(
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
+            )
+        );
+        $this->assertNull(
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+            $barObj,
+            'barProAttr',
+            'bar_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+        );
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+
+            $barObj,
+            'fooProAttr',
+            'foo_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
+        );
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+
+            $barObj,
+            'fooProAttr',
+            'foo_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+        );
+
+        $this->assertEquals(
+            'bar_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+        $this->assertEquals(
+            'foo_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
+            )
+        );
+        $this->assertEquals(
+            'foo_pro_attr_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+
+        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barProAttr', function (&$barObj) {
+            $barObj['props']['barProAttr'] = 'bar_pro_attr_new_new';
+        }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
+        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
+            $barObj['props']['fooProAttr'] = 'foo_pro_attr_new_new';
+        }, \Lxj\ClosurePHP\Sugars\Scope::PROTECTED);
+        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
+            $barObj['props']['fooProAttr'] = 'foo_pro_attr_new_new';
+        }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
+
+        $this->assertEquals(
+            'bar_pro_attr_new_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+        $this->assertEquals(
+            'foo_pro_attr_new_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
+            )
+        );
+        $this->assertEquals(
+            'foo_pro_attr_new_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'fooProAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+    }
+
+    public function testPrivateMethodsAndProps()
+    {
+        $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
+        if (!is_dir($compiledCodeDir)) {
+            mkdir($compiledCodeDir, 0777, true);
+        }
+        $this->generateCode(
+            $this->compile(__DIR__ . '/../examples/src'),
+            realpath($compiledCodeDir)
+        );
+
+        $barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
+
+        $this->assertEquals(
+            'Pri Bar',
+            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                $barObj,
+                'helloPriBar',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+
+        $this->assertNull(
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barPriAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
+
+        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
             $barObj,
             'barPriAttr',
+            'bar_pri_attr_new',
             \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-        ));
+        );
 
-        $fooObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Foo');
+        $this->assertEquals(
+            'bar_pri_attr_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barPriAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
 
-        $this->assertNull(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-            $fooObj,
-            'fooPriAttr',
-            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-        ));
+        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPriAttr', function (&$barObj) {
+            $barObj['props']['barPriAttr'] = 'bar_pri_attr_new_new';
+        }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
+
+        $this->assertEquals(
+            'bar_pri_attr_new_new',
+            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                $barObj,
+                'barPriAttr',
+                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+            )
+        );
     }
 }

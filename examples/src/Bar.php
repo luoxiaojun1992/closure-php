@@ -14,8 +14,18 @@ class Bar extends Foo
 
     private $barPriAttr;
 
-    function helloBar()
+    public function helloPubBar()
     {
-        return 'Bar';
+        return 'Pub Bar';
+    }
+
+    protected function helloProBar()
+    {
+        return 'Pro Bar';
+    }
+
+    private function helloPriBar()
+    {
+        return 'Pri Bar';
     }
 }
