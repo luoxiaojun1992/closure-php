@@ -2,6 +2,8 @@
 
 namespace Lxj\ClosurePHP\Sugars\Object;
 
+use Lxj\ClosurePHP\Sugars\Scope;
+
 /**
  * @param $objectData
  * @param $propName
@@ -218,12 +220,42 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
 
     $staticOrInstance = $isStatic ? 'static' : 'instance';
 
-    if (!isset($classDefinition['methods'][$staticOrInstance][$scope][$method])) {
+    if ($scope === Scope::PUBLIC) {
+        $availableScopes = [
+            Scope::PUBLIC,
+        ];
+    } elseif ($scope === Scope::PROTECTED) {
+        $availableScopes = [
+            Scope::PROTECTED,
+            Scope::PUBLIC,
+        ];
+    } elseif ($scope === Scope::PRIVATE) {
+        $availableScopes = [
+            Scope::PRIVATE,
+            Scope::PROTECTED,
+            Scope::PUBLIC,
+        ];
+    } else {
+        throw new \Exception('Unknown scope ' . $scope);
+    }
+
+    $matchedMethod = false;
+    $targetScope = null;
+
+    foreach ($availableScopes as $availableScope) {
+        if (isset($classDefinition['methods'][$staticOrInstance][$availableScope][$method])) {
+            $matchedMethod = true;
+            $targetScope = $availableScope;
+            break;
+        }
+    }
+
+    if (!$matchedMethod) {
         if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
             $parentObjectData['class'] = $classDefinition['extends'];
-            if ($scope === 'private') {
-                $parentScope = 'protected';
+            if ($scope === Scope::PRIVATE) {
+                $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
@@ -243,6 +275,6 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
 
     $functionName = $classDefinition['namespace'] . '\\' .
         'Class' . str_replace('\\', '_', $objectData['class'])
-        . ucfirst($staticOrInstance) . ucfirst($scope) . 'Func' . ucfirst($method);
+        . ucfirst($staticOrInstance) . ucfirst($targetScope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
 }

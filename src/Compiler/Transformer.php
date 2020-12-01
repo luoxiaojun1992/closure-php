@@ -77,11 +77,11 @@ class Transformer
                             if ($propertyStmt->isPublic()) {
                                 $propertyScope = Scope::PUBLIC;
                             } elseif ($propertyStmt->isProtected()) {
-                                $propertyScope = 'protected';
+                                $propertyScope = Scope::PROTECTED;
                             } elseif ($propertyStmt->isPrivate()) {
-                                $propertyScope = 'private';
+                                $propertyScope = Scope::PRIVATE;
                             } else {
-                                $propertyScope = 'unknown';
+                                $propertyScope = Scope::UNKNOWN;
                             }
 
                             $propertyIsStatic = $propertyStmt->isStatic();
@@ -104,13 +104,13 @@ class Transformer
                             $classMethodInfo['name'] = $classMethodStmt->name->name;
 
                             if ($classMethodStmt->isPublic()) {
-                                $classMethodInfo['scope'] = 'public';
+                                $classMethodInfo['scope'] = Scope::PUBLIC;
                             } elseif ($classMethodStmt->isProtected()) {
-                                $classMethodInfo['scope'] = 'protected';
+                                $classMethodInfo['scope'] = Scope::PROTECTED;
                             } elseif ($classMethodStmt->isPrivate()) {
-                                $classMethodInfo['scope'] = 'private';
+                                $classMethodInfo['scope'] = Scope::PRIVATE;
                             } else {
-                                $classMethodInfo['scope'] = 'unknown';
+                                $classMethodInfo['scope'] = Scope::UNKNOWN;
                             }
 
                             $classMethodInfo['is_static'] = $classMethodStmt->isStatic();
