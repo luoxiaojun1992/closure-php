@@ -23,7 +23,15 @@ function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
 
     $classDefinition = $classDefinitions[$class];
 
-    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+    $matchedProp = false;
+    foreach (availableScopes($scope) as $availableScope) {
+        if (isset($classDefinition['props']['instance'][$availableScope][$propName])) {
+            $matchedProp = true;
+            break;
+        }
+    }
+
+    if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
             $currentClass = $objectData['class'];
             $objectData['class'] = $classDefinition['extends'];
@@ -34,6 +42,8 @@ function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
             }
             modifyObjectProp($objectData, $propName, $callback, $parentScope);
             $objectData['class'] = $currentClass;
+        } else {
+            throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
     } else {
         $callback($objectData);
@@ -59,7 +69,15 @@ function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
 
     $classDefinition = $classDefinitions[$class];
 
-    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+    $matchedProp = false;
+    foreach (availableScopes($scope) as $availableScope) {
+        if (isset($classDefinition['props']['instance'][$availableScope][$propName])) {
+            $matchedProp = true;
+            break;
+        }
+    }
+
+    if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
             $currentClass = $objectData['class'];
             $objectData['class'] = $classDefinition['extends'];
@@ -70,6 +88,8 @@ function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
             }
             setObjectProp($objectData, $propName, $value, $parentScope);
             $objectData['class'] = $currentClass;
+        } else {
+            throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
     } else {
         $objectData['props'][$propName] = $value;
@@ -95,7 +115,15 @@ function accessObjectProp($objectData, $propName, $scope = 'public')
 
     $classDefinition = $classDefinitions[$class];
 
-    if (!isset($classDefinition['props']['instance'][$scope][$propName])) {
+    $matchedProp = false;
+    foreach (availableScopes($scope) as $availableScope) {
+        if (isset($classDefinition['props']['instance'][$availableScope][$propName])) {
+            $matchedProp = true;
+            break;
+        }
+    }
+
+    if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
             $parentObjectData['class'] = $classDefinition['extends'];
@@ -106,7 +134,7 @@ function accessObjectProp($objectData, $propName, $scope = 'public')
             }
             return accessObjectProp($parentObjectData, $propName, $parentScope);
         } else {
-            return null;
+            throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
     }
 
@@ -132,7 +160,7 @@ function setObjectPropDefaultValue($objectData)
 
     if (isset($classDefinition['props']['instance'])) {
         foreach ($classDefinition['props']['instance'] as $scopeProps) {
-            foreach ($scopeProps as $propInfo) {
+            foreach ($scopeProps as $scope => $propInfo) {
                 if (array_key_exists('default', $propInfo)) {
                     $objectData['props'][$propInfo['name']] = $propInfo['default'];
                 }
@@ -220,29 +248,10 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
 
     $staticOrInstance = $isStatic ? 'static' : 'instance';
 
-    if ($scope === Scope::PUBLIC) {
-        $availableScopes = [
-            Scope::PUBLIC,
-        ];
-    } elseif ($scope === Scope::PROTECTED) {
-        $availableScopes = [
-            Scope::PROTECTED,
-            Scope::PUBLIC,
-        ];
-    } elseif ($scope === Scope::PRIVATE) {
-        $availableScopes = [
-            Scope::PRIVATE,
-            Scope::PROTECTED,
-            Scope::PUBLIC,
-        ];
-    } else {
-        throw new \Exception('Unknown scope ' . $scope);
-    }
-
     $matchedMethod = false;
     $targetScope = null;
 
-    foreach ($availableScopes as $availableScope) {
+    foreach (availableScopes($scope) as $availableScope) {
         if (isset($classDefinition['methods'][$staticOrInstance][$availableScope][$method])) {
             $matchedMethod = true;
             $targetScope = $availableScope;
@@ -277,4 +286,35 @@ function callObjectMethod($objectData, $method, $scope = 'public', $parameters =
         'Class' . str_replace('\\', '_', $objectData['class'])
         . ucfirst($staticOrInstance) . ucfirst($targetScope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
+}
+
+/**
+ * @param $scope
+ * @return array
+ * @throws \Exception
+ */
+function availableScopes($scope)
+{
+    $availableScopes = [];
+
+    if ($scope === Scope::PUBLIC) {
+        $availableScopes = [
+            Scope::PUBLIC,
+        ];
+    } elseif ($scope === Scope::PROTECTED) {
+        $availableScopes = [
+            Scope::PROTECTED,
+            Scope::PUBLIC,
+        ];
+    } elseif ($scope === Scope::PRIVATE) {
+        $availableScopes = [
+            Scope::PRIVATE,
+            Scope::PROTECTED,
+            Scope::PUBLIC,
+        ];
+    } else {
+        throw new \Exception('Unknown scope ' . $scope);
+    }
+
+    return $availableScopes;
 }
