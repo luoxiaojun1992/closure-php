@@ -153,4 +153,32 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
             );
         }
     }
+
+    public function testAccessPrivateProp()
+    {
+        $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
+        if (!is_dir($compiledCodeDir)) {
+            mkdir($compiledCodeDir, 0777, true);
+        }
+        $this->generateCode(
+            $this->compile(__DIR__ . '/../examples/src'),
+            realpath($compiledCodeDir)
+        );
+
+        $barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
+
+        $this->assertNull(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+            $barObj,
+            'barPriAttr',
+            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+        ));
+
+        $fooObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Foo');
+
+        $this->assertNull(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+            $fooObj,
+            'fooPriAttr',
+            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
+        ));
+    }
 }
