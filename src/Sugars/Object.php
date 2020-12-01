@@ -11,7 +11,7 @@ use Lxj\ClosurePHP\Sugars\Scope;
  * @param string $scope
  * @throws \Exception
  */
-function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
+function modifyObjectProp(&$objectData, $propName, $callback, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
@@ -57,7 +57,7 @@ function modifyObjectProp(&$objectData, $propName, $callback, $scope = 'public')
  * @param string $scope
  * @throws \Exception
  */
-function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
+function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
@@ -103,7 +103,7 @@ function setObjectProp(&$objectData, $propName, $value, $scope = 'public')
  * @return null
  * @throws \Exception
  */
-function accessObjectProp($objectData, $propName, $scope = 'public')
+function accessObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
@@ -185,7 +185,7 @@ function setObjectPropDefaultValue($objectData)
  * @return array
  * @throws \Exception
  */
-function newObject($class, $scope = 'public', $constructParameters = [])
+function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
 {
     global $classDefinitions;
 
@@ -219,7 +219,7 @@ function newObject($class, $scope = 'public', $constructParameters = [])
  * @return mixed
  * @throws \Exception
  */
-function callStaticObjectMethod($objectData, $method, $scope = 'public', $parameters = []) {
+function callStaticObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = []) {
     return callObjectMethod($objectData, $method, $scope, $parameters, true);
 }
 
@@ -233,7 +233,7 @@ function callStaticObjectMethod($objectData, $method, $scope = 'public', $parame
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod($objectData, $method, $scope = 'public', $parameters = [], $isStatic = false, $originObjectData = null)
+function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = [], $isStatic = false, $originObjectData = null)
 {
     global $classDefinitions;
 
