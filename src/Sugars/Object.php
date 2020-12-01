@@ -158,6 +158,13 @@ function setObjectPropDefaultValue($objectData)
 
     $classDefinition = $classDefinitions[$class];
 
+    if (isset($classDefinition['extends'])) {
+        $parentObjectData = $objectData;
+        $parentObjectData['class'] = $classDefinition['extends'];
+        $objectData = setObjectPropDefaultValue($parentObjectData);
+        $objectData['class'] = $class;
+    }
+
     if (isset($classDefinition['props']['instance'])) {
         foreach ($classDefinition['props']['instance'] as $scopeProps) {
             foreach ($scopeProps as $scope => $propInfo) {
@@ -166,14 +173,6 @@ function setObjectPropDefaultValue($objectData)
                 }
             }
         }
-    }
-
-    if (isset($classDefinition['extends'])) {
-        $parentObjectData = $objectData;
-        $parentObjectData['class'] = $classDefinition['extends'];
-        $newObjectData = setObjectPropDefaultValue($parentObjectData);
-        $newObjectData['class'] = $class;
-        return $newObjectData;
     }
 
     return $objectData;
