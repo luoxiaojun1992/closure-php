@@ -46,271 +46,111 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
 
         $barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
 
-        $this->assertEquals(
-            'Foo',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloFoo',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-        $this->assertEquals(
-            'Bar',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloBar',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
+        $testScopes = [
+            \Lxj\ClosurePHP\Sugars\Scope::PUBLIC,
+            \Lxj\ClosurePHP\Sugars\Scope::PROTECTED,
+            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE,
+        ];
 
-        $this->assertEquals(
-            'Foo',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloFoo',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-        $this->assertEquals(
-            'Bar',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloBar',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
+        foreach ($testScopes as $scope) {
+            $this->assertEquals(
+                'Foo',
+                \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                    $barObj,
+                    'helloFoo',
+                    $scope
+                )
+            );
+            $this->assertEquals(
+                'Bar',
+                \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
+                    $barObj,
+                    'helloBar',
+                    $scope
+                )
+            );
+        }
 
-        $this->assertEquals(
-            'Foo',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloFoo',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
-        $this->assertEquals(
-            'Bar',
-            \Lxj\ClosurePHP\Sugars\Object\callObjectMethod(
-                $barObj,
-                'helloBar',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
+        foreach ($testScopes as $scope) {
+            $this->assertEquals(
+                'bar_pub_attr',
+                \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'barPubAttr',
+                    $scope
+                )
+            );
+            $this->assertEquals(
+                'foo_pub_attr',
+                \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'fooPubAttr',
+                    $scope
+                )
+            );
+        }
 
-        $this->assertEquals(
-            'bar_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+        foreach ($testScopes as $scope) {
+            \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
                 $barObj,
                 'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                'bar_pub_attr_new',
+                $scope
+            );
+            \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
+
                 $barObj,
                 'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
+                'foo_pub_attr_new',
+                $scope
+            );
+        }
 
-        $this->assertEquals(
-            'bar_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
+        foreach ($testScopes as $scope) {
+            $this->assertEquals(
+                'bar_pub_attr_new',
+                Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'barPubAttr',
+                    $scope
+                )
+            );
+            $this->assertEquals(
+                'foo_pub_attr_new',
+                \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'fooPubAttr',
+                    $scope
+                )
+            );
+        }
 
-        $this->assertEquals(
-            'bar_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
+        foreach ($testScopes as $scope) {
+            \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
+                $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
+            }, $scope);
+            \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
+                $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
+            }, $scope);
+        }
 
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-            $barObj,
-            'barPubAttr',
-            'bar_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-        );
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-
-            $barObj,
-            'fooPubAttr',
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-        );
-
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-            $barObj,
-            'barPubAttr',
-            'bar_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-        );
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-
-            $barObj,
-            'fooPubAttr',
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-        );
-
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-            $barObj,
-            'barPubAttr',
-            'bar_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-        );
-        \Lxj\ClosurePHP\Sugars\Object\setObjectProp(
-
-            $barObj,
-            'fooPubAttr',
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-        );
-
-        $this->assertEquals(
-            'bar_pub_attr_new',
-            Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-
-        $this->assertEquals(
-            'bar_pub_attr_new',
-            Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-
-        $this->assertEquals(
-            'bar_pub_attr_new',
-            Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
-
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
-            $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PUBLIC);
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-            $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PUBLIC);
-
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
-            $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PROTECTED);
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-            $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PROTECTED);
-
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
-            $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
-        \Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-            $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
-        }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
-
-        $this->assertEquals(
-            'bar_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PUBLIC
-            )
-        );
-
-        $this->assertEquals(
-            'bar_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PROTECTED
-            )
-        );
-
-        $this->assertEquals(
-            'bar_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'barPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
-        $this->assertEquals(
-            'foo_pub_attr_new_new',
-            \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
-                $barObj,
-                'fooPubAttr',
-                \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
-            )
-        );
+        foreach ($testScopes as $scope) {
+            $this->assertEquals(
+                'bar_pub_attr_new_new',
+                \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'barPubAttr',
+                    $scope
+                )
+            );
+            $this->assertEquals(
+                'foo_pub_attr_new_new',
+                \Lxj\ClosurePHP\Sugars\Object\accessObjectProp(
+                    $barObj,
+                    'fooPubAttr',
+                    $scope
+                )
+            );
+        }
     }
 }
