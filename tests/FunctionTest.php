@@ -299,6 +299,9 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function testPrivateMethodsAndProps()
     {
         $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
@@ -356,6 +359,44 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
                 'barPriAttr',
                 \Lxj\ClosurePHP\Sugars\Scope::PRIVATE
             )
+        );
+    }
+
+    public function testFacade()
+    {
+        $compiledCodeDir = __DIR__ . '/../output/tests/compile_and_call_method';
+        if (!is_dir($compiledCodeDir)) {
+            mkdir($compiledCodeDir, 0777, true);
+        }
+        $outputDir = realpath($compiledCodeDir);
+        $this->generateCode(
+            $this->compile(__DIR__ . '/../examples/src'),
+            $outputDir
+        );
+
+        $facadeFilePath = $outputDir . '/Facade.php';
+        file_put_contents(
+            $facadeFilePath,
+            '<?php' . str_repeat(PHP_EOL, 2) .
+            'namespace Lxj\ClosurePHP\Tests;' . str_repeat(PHP_EOL, 2) .
+            'class Facade extends \Lxj\ClosurePHP\Sugars\Facade' . PHP_EOL .
+            '{' . PHP_EOL .
+            '   protected static function getAccessor()' . PHP_EOL .
+            '   {' . PHP_EOL .
+            '       return \Lxj\ClosurePHP\Sugars\Object\newObject(\'Lxj\\ClosurePHP\\Demo\\Bar\');' . PHP_EOL .
+            '   }' . PHP_EOL .
+            '}' . PHP_EOL
+        );
+
+        include_once $facadeFilePath;
+
+        $this->assertEquals(
+            'Pub Foo',
+            \Lxj\ClosurePHP\Tests\Facade::helloPubFoo()
+        );
+        $this->assertEquals(
+            'Pub Bar',
+            \Lxj\ClosurePHP\Tests\Facade::helloPubBar()
         );
     }
 }
