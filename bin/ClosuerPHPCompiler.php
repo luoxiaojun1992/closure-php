@@ -5,6 +5,8 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     include_once __DIR__ . '/../vendor/autoload.php';
 } elseif (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
     include_once __DIR__ . '/../../vendor/autoload.php';
+} elseif (file_exists(__DIR__ . '/../../../../vendor/autoload.php')) {
+    include_once __DIR__ . '/../../../../vendor/autoload.php';
 }
 
 if (!isset($argv[1])) {
@@ -14,12 +16,12 @@ if (!isset($argv[1])) {
 }
 
 if (!isset($argv[2])) {
-    $argv[2] = realpath(__DIR__ . '/../output');
+    $argv[2] = __DIR__ . '/../output';
 }
 
 $path = $argv[1];
 
-$outputDir = $argv[2];
+$outputDir = realpath($argv[2]);
 
 list($classDefinitions, $compiledCode) = (new Lxj\ClosurePHP\Compiler\Compiler())->compilePath($path);
 
