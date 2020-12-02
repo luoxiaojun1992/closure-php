@@ -303,6 +303,11 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
     return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
 }
 
+function getThisObject($args)
+{
+    return $args[count($args) - 1];
+}
+
 /**
  * @param $scope
  * @return array
