@@ -35,8 +35,8 @@ function modifyObjectProp(&$objectData, $propName, $callback, $scope = Scope::PU
         if (isset($classDefinition['extends'])) {
             $currentClass = $objectData['class'];
             $objectData['class'] = $classDefinition['extends'];
-            if ($scope === 'private') {
-                $parentScope = 'protected';
+            if ($scope === Scope::PRIVATE) {
+                $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
@@ -81,8 +81,8 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
         if (isset($classDefinition['extends'])) {
             $currentClass = $objectData['class'];
             $objectData['class'] = $classDefinition['extends'];
-            if ($scope === 'private') {
-                $parentScope = 'protected';
+            if ($scope === Scope::PRIVATE) {
+                $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
@@ -127,8 +127,8 @@ function accessObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
         if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
             $parentObjectData['class'] = $classDefinition['extends'];
-            if ($scope === 'private') {
-                $parentScope = 'protected';
+            if ($scope === Scope::PRIVATE) {
+                $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
