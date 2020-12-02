@@ -213,6 +213,22 @@ function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
 
 /**
  * @param $objectData
+ * @return mixed
+ * @throws \Exception
+ */
+function getClass($objectData)
+{
+    $class = $objectData['class'];
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    return $class;
+}
+
+/**
+ * @param $objectData
  * @param $method
  * @param $scope
  * @param array $parameters
