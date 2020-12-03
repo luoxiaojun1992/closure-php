@@ -206,7 +206,7 @@ function setObjectPropDefaultValue(&$objectData, $class = null)
 
     if (isset($classDefinition['props']['instance'])) {
         foreach ($classDefinition['props']['instance'] as $scopeProps) {
-            foreach ($scopeProps as $scope => $propInfo) {
+            foreach ($scopeProps as $propInfo) {
                 if (array_key_exists('default', $propInfo)) {
                     $objectData['props'][$propInfo['name']] = $propInfo['default'];
                 }
