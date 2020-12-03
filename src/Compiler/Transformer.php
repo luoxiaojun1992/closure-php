@@ -163,12 +163,10 @@ class Transformer
                     $propertyStaticOrInstance = $propertyInfo['is_static'] ? 'static' : 'instance';
                     $litePropertyInfo = $propertyInfo;
                     if (array_key_exists('default', $propertyInfo)) {
-                        $propertyDefaultVal = (new Standard())->prettyPrintExpr($propertyInfo['default']);
-                        if (is_string($propertyDefaultVal)) {
-                            $litePropertyInfo['default'] = trim($propertyDefaultVal, '\'');
-                        } else {
-                            $litePropertyInfo['default'] = $propertyDefaultVal;
-                        }
+                        $propertyDefaultValCode = (new Standard())->prettyPrintExpr($propertyInfo['default']);
+                        $propertyDefaultVal = null;
+                        eval('$propertyDefaultVal = ' . $propertyDefaultValCode . ';');
+                        $litePropertyInfo['default'] = $propertyDefaultVal;
                     }
                     $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
 
