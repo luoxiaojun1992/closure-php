@@ -224,6 +224,7 @@ class Transformer
                     $liteMethodInfo['compiled_func_name'] = $classInfo['namespace'] . '\\' . $functionName;
                     $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
 
+                    //todo parameters
                     $functionStmt = new Function_($functionName);
                     $functionStmt->stmts = $methodInfo['stmts'];
                     $fileStmts[] = $functionStmt;

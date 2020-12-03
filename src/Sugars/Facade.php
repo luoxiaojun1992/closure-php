@@ -25,8 +25,7 @@ abstract class Facade
                 $accessor,
                 $name,
                 Scope::PUBLIC,
-                $arguments,
-                false
+                $arguments
             );
         }
 

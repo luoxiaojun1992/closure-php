@@ -245,7 +245,7 @@ function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
         return $objectData;
     }
 
-    callObjectMethod($objectData, '__construct', $scope, $constructParameters, false);
+    callObjectMethod($objectData, '__construct', $scope, $constructParameters);
 
     return $objectData;
 }
@@ -283,12 +283,11 @@ function getClass($objectData)
  * @param $method
  * @param string $scope
  * @param array $parameters
- * @param false $isStatic
  * @param null $originObjectData
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = [], $isStatic = false, $originObjectData = null)
+function callObjectMethod(&$objectData, $method, $scope = Scope::PUBLIC, $parameters = [], &$originObjectData = null)
 {
     global $classDefinitions;
 
@@ -300,7 +299,7 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
 
     $classDefinition = $classDefinitions[$class];
 
-    $staticOrInstance = $isStatic ? 'static' : 'instance';
+    $staticOrInstance = 'instance';
 
     $matchedMethod = false;
     $functionName = null;
@@ -322,9 +321,12 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
             } else {
                 $parentScope = $scope;
             }
+            if (!$originObjectData) {
+                $originObjectData = &$objectData;
+            }
             return callObjectMethod(
-                $parentObjectData, $method, $parentScope, $parameters, $isStatic,
-                $originObjectData ?: $objectData
+                $parentObjectData, $method, $parentScope, $parameters,
+                $originObjectData
             );
         } else {
             throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
@@ -336,7 +338,13 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
         $classDefinitions[$class]['loaded'] = true;
     }
 
-    return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
+    if ($originObjectData) {
+        $parameters[] = &$originObjectData;
+    } else {
+        $parameters[] = &$objectData;
+    }
+
+    return call_user_func_array($functionName, $parameters);
 }
 
 /**
@@ -344,46 +352,83 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
  * @param $method
  * @param string $scope
  * @param array $parameters
- * @param false $isStatic
- * @param null $originObjectData
  * @return mixed
  * @throws \Exception
  */
-function call($objectData, $method, $scope = Scope::PUBLIC, $parameters = [], $isStatic = false, $originObjectData = null)
+function call(&$objectData, $method, $scope = Scope::PUBLIC, $parameters = [])
 {
     return callObjectMethod(
         $objectData,
         $method,
         $scope,
-        $parameters,
-        $isStatic,
-        $originObjectData
+        $parameters
     );
 }
 
 /**
- * @param $objectData
+ * @param $class
  * @param $method
  * @param $scope
  * @param array $parameters
  * @return mixed
  * @throws \Exception
  */
-function callStaticObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = []) {
-    return callObjectMethod($objectData, $method, $scope, $parameters, true);
+function callStaticObjectMethod($class, $method, $scope = Scope::PUBLIC, $parameters = []) {
+    global $classDefinitions;
+
+    if (!isset($classDefinitions[$class])) {
+        throw new \Exception('Class ' . $class . ' not existed');
+    }
+
+    $classDefinition = $classDefinitions[$class];
+
+    $staticOrInstance = 'static';
+
+    $matchedMethod = false;
+    $functionName = null;
+
+    foreach (availableScopes($scope) as $availableScope) {
+        if (isset($classDefinition['methods'][$staticOrInstance][$availableScope][$method])) {
+            $matchedMethod = true;
+            $functionName = $classDefinition['methods'][$staticOrInstance][$availableScope][$method]['compiled_func_name'];
+            break;
+        }
+    }
+
+    if (!$matchedMethod) {
+        if (isset($classDefinition['extends'])) {
+            if ($scope === Scope::PRIVATE) {
+                $parentScope = Scope::PROTECTED;
+            } else {
+                $parentScope = $scope;
+            }
+            return callStaticObjectMethod(
+                $classDefinition['extends'], $method, $parentScope, $parameters
+            );
+        } else {
+            throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
+        }
+    }
+
+    if (!$classDefinition['loaded']) {
+        include_once $classDefinition['ƒile_path'];
+        $classDefinitions[$class]['loaded'] = true;
+    }
+
+    return call_user_func_array($functionName, $parameters);
 }
 
 /**
- * @param $objectData
+ * @param $class
  * @param $method
  * @param string $scope
  * @param array $parameters
  * @return mixed
  * @throws \Exception
  */
-function callStatic($objectData, $method, $scope = Scope::PUBLIC, $parameters = [])
+function callStatic($class, $method, $scope = Scope::PUBLIC, $parameters = [])
 {
-    return callStaticObjectMethod($objectData, $method, $scope, $parameters);
+    return callStaticObjectMethod($class, $method, $scope, $parameters);
 }
 
 function getThisObject($args)
