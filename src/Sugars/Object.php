@@ -278,6 +278,11 @@ function getClass($objectData)
     return $class;
 }
 
+function serialize($objectData)
+{
+    return json_encode($objectData);
+}
+
 /**
  * @param $objectData
  * @param $method
