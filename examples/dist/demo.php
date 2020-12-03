@@ -182,17 +182,17 @@ $classDefinitions = array (
 $barObj = \Lxj\ClosurePHP\Sugars\Object\newObject('Lxj\\ClosurePHP\\Demo\\Bar');
 echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloPubFoo', 'public'), PHP_EOL;
 echo \Lxj\ClosurePHP\Sugars\Object\callObjectMethod($barObj, 'helloPubBar', 'public'), PHP_EOL;
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'barPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'fooPubAttr', 'public'));
 \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'barPubAttr', 'bar_pub_attr_new', 'public');
 \Lxj\ClosurePHP\Sugars\Object\setObjectProp($barObj, 'fooPubAttr', 'foo_pub_attr_new', 'public');
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
-\Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'barPubAttr', function (&$barObj) {
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'barPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'fooPubAttr', 'public'));
+\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', function (&$barObj) {
     $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
 }, 'public');
-\Lxj\ClosurePHP\Sugars\Object\modifyObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
+\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
     $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
 }, 'public');
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', 'public'));
-var_dump(\Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'barPubAttr', 'public'));
+var_dump(\Lxj\ClosurePHP\Sugars\Object\getObjectProp($barObj, 'fooPubAttr', 'public'));

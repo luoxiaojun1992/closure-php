@@ -9,9 +9,10 @@ use Lxj\ClosurePHP\Sugars\Scope;
  * @param $propName
  * @param $callback
  * @param string $scope
+ * @return mixed
  * @throws \Exception
  */
-function modifyObjectProp(&$objectData, $propName, $callback, $scope = Scope::PUBLIC)
+function accessObjectProp(&$objectData, $propName, $callback, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
@@ -40,13 +41,14 @@ function modifyObjectProp(&$objectData, $propName, $callback, $scope = Scope::PU
             } else {
                 $parentScope = $scope;
             }
-            modifyObjectProp($objectData, $propName, $callback, $parentScope);
+            $modifyResult = accessObjectProp($objectData, $propName, $callback, $parentScope);
             $objectData['class'] = $currentClass;
+            return $modifyResult;
         } else {
             throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
     } else {
-        $callback($objectData);
+        return $callback($objectData);
     }
 }
 
@@ -103,7 +105,7 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
  * @return null
  * @throws \Exception
  */
-function accessObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
+function getObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
@@ -132,7 +134,7 @@ function accessObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
             } else {
                 $parentScope = $scope;
             }
-            return accessObjectProp($parentObjectData, $propName, $parentScope);
+            return getObjectProp($parentObjectData, $propName, $parentScope);
         } else {
             throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
