@@ -394,6 +394,11 @@ function getThisObject($args)
     return $args[count($args) - 1];
 }
 
+function thisObj($args)
+{
+    return getThisObject($args);
+}
+
 /**
  * @param $scope
  * @return array
