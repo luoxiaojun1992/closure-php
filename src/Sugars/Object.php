@@ -55,6 +55,19 @@ function accessObjectProp(&$objectData, $propName, $callback, $scope = Scope::PU
 /**
  * @param $objectData
  * @param $propName
+ * @param $callback
+ * @param string $scope
+ * @return mixed
+ * @throws \Exception
+ */
+function access(&$objectData, $propName, $callback, $scope = Scope::PUBLIC)
+{
+    return accessObjectProp($objectData, $propName, $callback, $scope);
+}
+
+/**
+ * @param $objectData
+ * @param $propName
  * @param $value
  * @param string $scope
  * @throws \Exception
@@ -101,6 +114,18 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
 /**
  * @param $objectData
  * @param $propName
+ * @param $value
+ * @param string $scope
+ * @throws \Exception
+ */
+function set(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
+{
+    setObjectProp($objectData, $propName, $value, $scope);
+}
+
+/**
+ * @param $objectData
+ * @param $propName
  * @param string $scope
  * @return null
  * @throws \Exception
@@ -141,6 +166,18 @@ function getObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
     }
 
     return $objectData['props'][$propName] ?? null;
+}
+
+/**
+ * @param $objectData
+ * @param $propName
+ * @param string $scope
+ * @return null
+ * @throws \Exception
+ */
+function get($objectData, $propName, $scope = Scope::PUBLIC)
+{
+    return getObjectProp($objectData, $propName, $scope);
 }
 
 /**
@@ -214,6 +251,18 @@ function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
 }
 
 /**
+ * @param $class
+ * @param string $scope
+ * @param array $constructParameters
+ * @return array
+ * @throws \Exception
+ */
+function newObj($class, $scope = Scope::PUBLIC, $constructParameters = [])
+{
+    return newObject($class, $scope, $constructParameters);
+}
+
+/**
  * @param $objectData
  * @return mixed
  * @throws \Exception
@@ -227,18 +276,6 @@ function getClass($objectData)
     }
 
     return $class;
-}
-
-/**
- * @param $objectData
- * @param $method
- * @param $scope
- * @param array $parameters
- * @return mixed
- * @throws \Exception
- */
-function callStaticObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = []) {
-    return callObjectMethod($objectData, $method, $scope, $parameters, true);
 }
 
 /**
@@ -303,6 +340,53 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
         'Class' . str_replace('\\', '_', $objectData['class'])
         . ucfirst($staticOrInstance) . ucfirst($targetScope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
+}
+
+/**
+ * @param $objectData
+ * @param $method
+ * @param string $scope
+ * @param array $parameters
+ * @param false $isStatic
+ * @param null $originObjectData
+ * @return mixed
+ * @throws \Exception
+ */
+function call($objectData, $method, $scope = Scope::PUBLIC, $parameters = [], $isStatic = false, $originObjectData = null)
+{
+    return callObjectMethod(
+        $objectData,
+        $method,
+        $scope,
+        $parameters,
+        $isStatic,
+        $originObjectData
+    );
+}
+
+/**
+ * @param $objectData
+ * @param $method
+ * @param $scope
+ * @param array $parameters
+ * @return mixed
+ * @throws \Exception
+ */
+function callStaticObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $parameters = []) {
+    return callObjectMethod($objectData, $method, $scope, $parameters, true);
+}
+
+/**
+ * @param $objectData
+ * @param $method
+ * @param string $scope
+ * @param array $parameters
+ * @return mixed
+ * @throws \Exception
+ */
+function callStatic($objectData, $method, $scope = Scope::PUBLIC, $parameters = [])
+{
+    return callStaticObjectMethod($objectData, $method, $scope, $parameters);
 }
 
 function getThisObject($args)
