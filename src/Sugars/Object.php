@@ -303,12 +303,12 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
     $staticOrInstance = $isStatic ? 'static' : 'instance';
 
     $matchedMethod = false;
-    $targetScope = null;
+    $functionName = null;
 
     foreach (availableScopes($scope) as $availableScope) {
         if (isset($classDefinition['methods'][$staticOrInstance][$availableScope][$method])) {
             $matchedMethod = true;
-            $targetScope = $availableScope;
+            $functionName = $classDefinition['methods'][$staticOrInstance][$availableScope][$method]['compiled_func_name'];
             break;
         }
     }
@@ -332,13 +332,10 @@ function callObjectMethod($objectData, $method, $scope = Scope::PUBLIC, $paramet
     }
 
     if (!$classDefinition['loaded']) {
-        require_once $classDefinition['ƒile_path'];
+        include_once $classDefinition['ƒile_path'];
         $classDefinitions[$class]['loaded'] = true;
     }
 
-    $functionName = $classDefinition['namespace'] . '\\' .
-        'Class' . str_replace('\\', '_', $objectData['class'])
-        . ucfirst($staticOrInstance) . ucfirst($targetScope) . 'Func' . ucfirst($method);
     return call_user_func_array($functionName, array_merge($parameters, [$originObjectData ?: $objectData]));
 }
 

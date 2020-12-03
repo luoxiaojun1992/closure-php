@@ -43,6 +43,7 @@ class Transformer
                     foreach ($uses as $useUse) {
                         $useInfo = [];
                         $useClassName = implode('\\', $useUse->name->parts);
+                        //TODO alias
                         $realUseClassName =  $useUse->name->parts[count($useUse->name->parts) - 1];
                         $useInfo['name'] = $useClassName;
                         $classInfo['uses'][$realUseClassName] = $useInfo;
@@ -168,12 +169,12 @@ class Transformer
                         eval('$propertyDefaultVal = ' . $propertyDefaultValCode . ';');
                         $litePropertyInfo['default'] = $propertyDefaultVal;
                     }
-                    $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
 
                     if ($propertyInfo['is_static']) {
                         $varName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
                             ucfirst($propertyStaticOrInstance) .
                             ucfirst($propertyInfo['scope']) . 'Prop' . ucfirst($propertyName);
+                        $litePropertyInfo['compiled_var_name'] = $varName;
                         $varDeclareStmt = new Global_([
                             new Variable($varName)
                         ]);
@@ -188,6 +189,8 @@ class Transformer
                             $fileStmts[] = $varAssignStmt;
                         }
                     }
+
+                    $classDefinition['props'][$propertyStaticOrInstance][$propertyInfo['scope']][$propertyName] = $litePropertyInfo;
                 }
             }
 
@@ -195,10 +198,11 @@ class Transformer
                 foreach ($classInfo['consts'] as $constName => $constInfo) {
                     $liteConstInfo = $constInfo;
                     unset($liteConstInfo['value']);
-                    $classDefinition['consts'][$constName][] = $liteConstInfo;
-
                     $constVarName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
                         'Const' . ucfirst($constName);
+                    $liteConstInfo['compiled_var_name'] = $constVarName;
+                    $classDefinition['consts'][$constName][] = $liteConstInfo;
+
                     $constVarDefineStmt = new Expression(
                         new FuncCall(
                             new Name('define'),
@@ -214,13 +218,13 @@ class Transformer
                     $methodStaticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
                     $liteMethodInfo = $methodInfo;
                     unset($liteMethodInfo['stmts']);
+                    $functionName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
+                        ucfirst($methodStaticOrInstance) .
+                        ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName);
+                    $liteMethodInfo['compiled_func_name'] = $functionName;
                     $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
 
-                    $functionStmt = new Function_(
-                        'Class' . ucfirst(str_replace('\\', '_', $className)) .
-                        ucfirst($methodStaticOrInstance) .
-                        ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName)
-                    );
+                    $functionStmt = new Function_($functionName);
                     $functionStmt->stmts = $methodInfo['stmts'];
                     $fileStmts[] = $functionStmt;
                 }
