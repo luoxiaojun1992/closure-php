@@ -127,10 +127,10 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
 
         foreach ($testScopes as $scope) {
             \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPubAttr', function (&$barObj) {
-                $barObj['props']['barPubAttr'] = 'bar_pub_attr_new_new';
+                $barObj['props_barPubAttr'] = 'bar_pub_attr_new_new';
             }, $scope);
             \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-                $barObj['props']['fooPubAttr'] = 'foo_pub_attr_new_new';
+                $barObj['props_fooPubAttr'] = 'foo_pub_attr_new_new';
             }, $scope);
         }
 
@@ -264,13 +264,13 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
         );
 
         \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barProAttr', function (&$barObj) {
-            $barObj['props']['barProAttr'] = 'bar_pro_attr_new_new';
+            $barObj['props_barProAttr'] = 'bar_pro_attr_new_new';
         }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
         \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-            $barObj['props']['fooProAttr'] = 'foo_pro_attr_new_new';
+            $barObj['props_fooProAttr'] = 'foo_pro_attr_new_new';
         }, \Lxj\ClosurePHP\Sugars\Scope::PROTECTED);
         \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'fooPubAttr', function (&$barObj) {
-            $barObj['props']['fooProAttr'] = 'foo_pro_attr_new_new';
+            $barObj['props_fooProAttr'] = 'foo_pro_attr_new_new';
         }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
 
         $this->assertEquals(
@@ -349,7 +349,7 @@ class FunctionTest extends \PHPUnit\Framework\TestCase
         );
 
         \Lxj\ClosurePHP\Sugars\Object\accessObjectProp($barObj, 'barPriAttr', function (&$barObj) {
-            $barObj['props']['barPriAttr'] = 'bar_pri_attr_new_new';
+            $barObj['props_barPriAttr'] = 'bar_pri_attr_new_new';
         }, \Lxj\ClosurePHP\Sugars\Scope::PRIVATE);
 
         $this->assertEquals(
