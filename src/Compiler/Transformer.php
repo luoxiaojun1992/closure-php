@@ -200,7 +200,7 @@ class Transformer
                     unset($liteConstInfo['value']);
                     $constVarName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
                         'Const' . ucfirst($constName);
-                    $liteConstInfo['compiled_var_name'] = $constVarName;
+                    $liteConstInfo['compiled_var_name'] = $classInfo['namespace'] . '\\' . $constVarName;
                     $classDefinition['consts'][$constName][] = $liteConstInfo;
 
                     $constVarDefineStmt = new Expression(
@@ -221,7 +221,7 @@ class Transformer
                     $functionName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
                         ucfirst($methodStaticOrInstance) .
                         ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName);
-                    $liteMethodInfo['compiled_func_name'] = $functionName;
+                    $liteMethodInfo['compiled_func_name'] = $classInfo['namespace'] . '\\' . $functionName;
                     $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
 
                     $functionStmt = new Function_($functionName);
