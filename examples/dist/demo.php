@@ -55,6 +55,7 @@ $classDefinitions = array (
                                             'name' => 'helloPubFoo',
                                             'scope' => 'public',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_FooInstancePublicFuncHelloPubFoo',
                                         ),
                                 ),
                             'protected' =>
@@ -64,6 +65,7 @@ $classDefinitions = array (
                                             'name' => 'helloProFoo',
                                             'scope' => 'protected',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_FooInstanceProtectedFuncHelloProFoo',
                                         ),
                                 ),
                             'private' =>
@@ -73,6 +75,7 @@ $classDefinitions = array (
                                             'name' => 'helloPriFoo',
                                             'scope' => 'private',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_FooInstancePrivateFuncHelloPriFoo',
                                         ),
                                 ),
                         ),
@@ -96,6 +99,7 @@ $classDefinitions = array (
                                             'is_static' => true,
                                             'name' => 'barPubStatAttr',
                                             'default' => 'bar_pub_stat_attr',
+                                            'compiled_var_name' => 'ClassLxj_ClosurePHP_Demo_BarStaticPublicPropBarPubStatAttr',
                                         ),
                                 ),
                         ),
@@ -138,6 +142,7 @@ $classDefinitions = array (
                             0 =>
                                 array (
                                     'name' => 'BAR_CONST',
+                                    'compiled_var_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_BarConstBAR_CONST',
                                 ),
                         ),
                 ),
@@ -152,6 +157,7 @@ $classDefinitions = array (
                                             'name' => 'helloPubBar',
                                             'scope' => 'public',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_BarInstancePublicFuncHelloPubBar',
                                         ),
                                 ),
                             'protected' =>
@@ -161,6 +167,7 @@ $classDefinitions = array (
                                             'name' => 'helloProBar',
                                             'scope' => 'protected',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_BarInstanceProtectedFuncHelloProBar',
                                         ),
                                 ),
                             'private' =>
@@ -170,6 +177,7 @@ $classDefinitions = array (
                                             'name' => 'helloPriBar',
                                             'scope' => 'private',
                                             'is_static' => false,
+                                            'compiled_func_name' => 'Lxj\\ClosurePHP\\Demo\\ClassLxj_ClosurePHP_Demo_BarInstancePrivateFuncHelloPriBar',
                                         ),
                                 ),
                         ),
