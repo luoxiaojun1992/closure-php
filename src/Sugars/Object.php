@@ -283,13 +283,13 @@ function getClass($objectData)
  * @param $method
  * @param string $scope
  * @param array $parameters
- * @param null $originObjectData
+ * @param null $class
  * @return mixed
  * @throws \Exception
  */
 function callObjectMethod(
     &$objectData, $method, $scope = Scope::PUBLIC,
-    $parameters = [], &$originObjectData = null, $class = null
+    $parameters = [], $class = null
 )
 {
     global $classDefinitions;
@@ -324,12 +324,8 @@ function callObjectMethod(
             } else {
                 $parentScope = $scope;
             }
-            if (!$originObjectData) {
-                $originObjectData = &$objectData;
-            }
             return callObjectMethod(
-                $objectData, $method, $parentScope, $parameters,
-                $originObjectData, $classDefinition['extends']
+                $objectData, $method, $parentScope, $parameters, $classDefinition['extends']
             );
         } else {
             throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
@@ -341,11 +337,7 @@ function callObjectMethod(
         $classDefinitions[$class]['loaded'] = true;
     }
 
-    if ($originObjectData) {
-        $parameters[] = &$originObjectData;
-    } else {
-        $parameters[] = &$objectData;
-    }
+    $parameters[] = &$objectData;
 
     return call_user_func_array($functionName, $parameters);
 }
