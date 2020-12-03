@@ -182,14 +182,17 @@ function get($objectData, $propName, $scope = Scope::PUBLIC)
 
 /**
  * @param $objectData
+ * @param null $class
  * @return mixed
  * @throws \Exception
  */
-function setObjectPropDefaultValue($objectData)
+function setObjectPropDefaultValue(&$objectData, $class = null)
 {
     global $classDefinitions;
 
-    $class = $objectData['class'];
+    if (!$class) {
+        $class = $objectData['class'];
+    }
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -198,10 +201,7 @@ function setObjectPropDefaultValue($objectData)
     $classDefinition = $classDefinitions[$class];
 
     if (isset($classDefinition['extends'])) {
-        $parentObjectData = $objectData;
-        $parentObjectData['class'] = $classDefinition['extends'];
-        $objectData = setObjectPropDefaultValue($parentObjectData);
-        $objectData['class'] = $class;
+        setObjectPropDefaultValue($objectData, $classDefinition['extends']);
     }
 
     if (isset($classDefinition['props']['instance'])) {
@@ -238,7 +238,7 @@ function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
         'class' => $class,
     ];
 
-    $objectData = setObjectPropDefaultValue($objectData);
+    setObjectPropDefaultValue($objectData);
 
     $constructMethod = '__construct';
     if (!isset($classDefinition['methods']['instance'][$scope][$constructMethod])) {
@@ -287,11 +287,16 @@ function getClass($objectData)
  * @return mixed
  * @throws \Exception
  */
-function callObjectMethod(&$objectData, $method, $scope = Scope::PUBLIC, $parameters = [], &$originObjectData = null)
+function callObjectMethod(
+    &$objectData, $method, $scope = Scope::PUBLIC,
+    $parameters = [], &$originObjectData = null, $class = null
+)
 {
     global $classDefinitions;
 
-    $class = $objectData['class'];
+    if (!$class) {
+        $class = $objectData['class'];
+    }
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -314,8 +319,6 @@ function callObjectMethod(&$objectData, $method, $scope = Scope::PUBLIC, $parame
 
     if (!$matchedMethod) {
         if (isset($classDefinition['extends'])) {
-            $parentObjectData = $objectData;
-            $parentObjectData['class'] = $classDefinition['extends'];
             if ($scope === Scope::PRIVATE) {
                 $parentScope = Scope::PROTECTED;
             } else {
@@ -325,8 +328,8 @@ function callObjectMethod(&$objectData, $method, $scope = Scope::PUBLIC, $parame
                 $originObjectData = &$objectData;
             }
             return callObjectMethod(
-                $parentObjectData, $method, $parentScope, $parameters,
-                $originObjectData
+                $objectData, $method, $parentScope, $parameters,
+                $originObjectData, $classDefinition['extends']
             );
         } else {
             throw new \Exception('Method ' . $method . ' of Class ' . $class . ' not existed');
