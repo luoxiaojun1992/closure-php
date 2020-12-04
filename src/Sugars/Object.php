@@ -278,9 +278,9 @@ function getClass($objectData)
     return $class;
 }
 
-function serialize($objectData)
+function serialize($objectData, $phpSerialize = false)
 {
-    return json_encode($objectData);
+    return $phpSerialize ? serialize($objectData) : json_encode($objectData);
 }
 
 /**
