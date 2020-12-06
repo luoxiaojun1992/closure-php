@@ -16,7 +16,7 @@ function accessObjectProp(&$objectData, $propName, $callback, $scope = Scope::PU
 {
     global $classDefinitions;
 
-    $class = $objectData['class'];
+    $class = $objectData['c'];
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -34,15 +34,15 @@ function accessObjectProp(&$objectData, $propName, $callback, $scope = Scope::PU
 
     if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
-            $currentClass = $objectData['class'];
-            $objectData['class'] = $classDefinition['extends'];
+            $currentClass = $objectData['c'];
+            $objectData['c'] = $classDefinition['extends'];
             if ($scope === Scope::PRIVATE) {
                 $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
             $modifyResult = accessObjectProp($objectData, $propName, $callback, $parentScope);
-            $objectData['class'] = $currentClass;
+            $objectData['c'] = $currentClass;
             return $modifyResult;
         } else {
             throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
@@ -76,7 +76,7 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
-    $class = $objectData['class'];
+    $class = $objectData['c'];
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -94,15 +94,15 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
 
     if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
-            $currentClass = $objectData['class'];
-            $objectData['class'] = $classDefinition['extends'];
+            $currentClass = $objectData['c'];
+            $objectData['c'] = $classDefinition['extends'];
             if ($scope === Scope::PRIVATE) {
                 $parentScope = Scope::PROTECTED;
             } else {
                 $parentScope = $scope;
             }
             setObjectProp($objectData, $propName, $value, $parentScope);
-            $objectData['class'] = $currentClass;
+            $objectData['c'] = $currentClass;
         } else {
             throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
@@ -134,7 +134,7 @@ function getObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
 {
     global $classDefinitions;
 
-    $class = $objectData['class'];
+    $class = $objectData['c'];
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -153,7 +153,7 @@ function getObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
     if (!$matchedProp) {
         if (isset($classDefinition['extends'])) {
             $parentObjectData = $objectData;
-            $parentObjectData['class'] = $classDefinition['extends'];
+            $parentObjectData['c'] = $classDefinition['extends'];
             if ($scope === Scope::PRIVATE) {
                 $parentScope = Scope::PROTECTED;
             } else {
@@ -191,7 +191,7 @@ function setObjectPropDefaultValue(&$objectData, $class = null)
     global $classDefinitions;
 
     if (!$class) {
-        $class = $objectData['class'];
+        $class = $objectData['c'];
     }
 
     if (!isset($classDefinitions[$class])) {
@@ -235,7 +235,7 @@ function newObject($class, $scope = Scope::PUBLIC, $constructParameters = [])
     $classDefinition = $classDefinitions[$class];
 
     $objectData = [
-        'class' => $class,
+        'c' => $class,
     ];
 
     setObjectPropDefaultValue($objectData);
@@ -269,7 +269,7 @@ function newObj($class, $scope = Scope::PUBLIC, $constructParameters = [])
  */
 function getClass($objectData)
 {
-    $class = $objectData['class'];
+    $class = $objectData['c'];
 
     if (!isset($classDefinitions[$class])) {
         throw new \Exception('Class ' . $class . ' not existed');
@@ -300,7 +300,7 @@ function callObjectMethod(
     global $classDefinitions;
 
     if (!$class) {
-        $class = $objectData['class'];
+        $class = $objectData['c'];
     }
 
     if (!isset($classDefinitions[$class])) {
