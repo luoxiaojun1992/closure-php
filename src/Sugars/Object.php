@@ -107,7 +107,7 @@ function setObjectProp(&$objectData, $propName, $value, $scope = Scope::PUBLIC)
             throw new \Exception('Prop ' . $propName . ' of Class ' . $class . ' not existed');
         }
     } else {
-        $objectData['props_' . $propName] = $value;
+        $objectData['p_' . $propName] = $value;
     }
 }
 
@@ -165,7 +165,7 @@ function getObjectProp($objectData, $propName, $scope = Scope::PUBLIC)
         }
     }
 
-    return $objectData['props_' . $propName] ?? null;
+    return $objectData['p_' . $propName] ?? null;
 }
 
 /**
@@ -208,7 +208,7 @@ function setObjectPropDefaultValue(&$objectData, $class = null)
         foreach ($classDefinition['props']['instance'] as $scopeProps) {
             foreach ($scopeProps as $propInfo) {
                 if (array_key_exists('default', $propInfo)) {
-                    $objectData['props_' . $propInfo['name']] = $propInfo['default'];
+                    $objectData['p_' . $propInfo['name']] = $propInfo['default'];
                 }
             }
         }
