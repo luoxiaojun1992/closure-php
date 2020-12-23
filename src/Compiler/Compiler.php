@@ -19,12 +19,16 @@ class Compiler
     public function compile($classCode)
     {
         $ast = $this->parseAst($classCode);
-        list($classDefinitions, $transformedAst) = $this->transform($ast);
-        $transformedCode = [];
-        foreach ($transformedAst as $className => $transformedClassAst) {
-            $transformedCode[$className] = $this->generateCode([$transformedClassAst]);
+        if ($ast) {
+            list($classDefinitions, $transformedAst) = $this->transform($ast);
+            $transformedCode = [];
+            foreach ($transformedAst as $className => $transformedClassAst) {
+                $transformedCode[$className] = $this->generateCode([$transformedClassAst]);
+            }
+            return [$classDefinitions, $transformedCode];
         }
-        return [$classDefinitions, $transformedCode];
+
+        return [[], []];
     }
 
     protected function removePHPTag($code)
@@ -34,6 +38,8 @@ class Compiler
 
     public function compilePath($fileOrDir)
     {
+        $compiledResult = [[], []];
+
         $classCodeArr = [];
 
         if (is_dir($fileOrDir)) {
@@ -41,7 +47,9 @@ class Compiler
             while ($subFileOrDir = readdir($fd)) {
                 if (!in_array($subFileOrDir, ['.', '..'])) {
                     $filePath = $fileOrDir . '/' . $subFileOrDir;
-                    $classCodeArr[] = $this->removePHPTag(file_get_contents($filePath));
+                    $subCompiledResult = $this->compilePath($filePath);
+                    $compiledResult[0] = array_merge($compiledResult[0], $subCompiledResult[0]);
+                    $compiledResult[1] = array_merge($compiledResult[1], $subCompiledResult[1]);
                 }
             }
             closedir($fd);
@@ -49,13 +57,19 @@ class Compiler
             $classCodeArr[] = $this->removePHPTag(file_get_contents($fileOrDir));
         }
 
-        return $this->compile(
-            '<?php' . str_repeat(PHP_EOL, 2) .
-            implode(
-                str_repeat(PHP_EOL, 2),
-                $classCodeArr
-            )
-        );
+        if ($classCodeArr) {
+            $subCompiledResult = $this->compile(
+                '<?php' . str_repeat(PHP_EOL, 2) .
+                implode(
+                    str_repeat(PHP_EOL, 2),
+                    $classCodeArr
+                )
+            );
+            $compiledResult[0] = array_merge($compiledResult[0], $subCompiledResult[0]);
+            $compiledResult[1] = array_merge($compiledResult[1], $subCompiledResult[1]);
+        }
+
+        return $compiledResult;
     }
 
     protected function parseAst($code)

@@ -7,6 +7,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
+use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassConst;
@@ -116,6 +117,11 @@ class Transformer
 
                             $classMethodInfo['is_static'] = $classMethodStmt->isStatic();
 
+                            $classMethodInfo['params'] = $classMethodStmt->getParams();
+                            $classMethodInfo['comments'] = $classMethodStmt->getComments();
+                            $classMethodInfo['doc_comment'] = $classMethodStmt->getDocComment();
+                            $classMethodInfo['return_type'] = $classMethodStmt->getReturnType();
+
                             $classMethodBodyStmt = $classMethodStmt->stmts;
                             $classMethodInfo['stmts'] = $classMethodBodyStmt;
 
@@ -218,15 +224,37 @@ class Transformer
                     $methodStaticOrInstance = $methodInfo['is_static'] ? 'static' : 'instance';
                     $liteMethodInfo = $methodInfo;
                     unset($liteMethodInfo['stmts']);
+                    unset($liteMethodInfo['params']);
+                    unset($liteMethodInfo['doc_comment']);
+                    unset($liteMethodInfo['return_type']);
                     $functionName = 'Class' . ucfirst(str_replace('\\', '_', $className)) .
                         ucfirst($methodStaticOrInstance) .
                         ucfirst($methodInfo['scope']) . 'Func' . ucfirst($methodName);
                     $liteMethodInfo['compiled_func_name'] = $classInfo['namespace'] . '\\' . $functionName;
                     $classDefinition['methods'][$methodStaticOrInstance][$methodInfo['scope']][$methodInfo['name']] = $liteMethodInfo;
 
-                    //todo parameters
                     $functionStmt = new Function_($functionName);
-                    $functionStmt->stmts = $methodInfo['stmts'];
+                    if ($methodInfo['stmts']) {
+                        $functionStmt->stmts = $methodInfo['stmts'];
+                    }
+                    if ($methodInfo['is_static']) {
+                        if ($methodInfo['params']) {
+                            $functionStmt->params = $methodInfo['params'];
+                        }
+                    } else {
+                        $params = $methodInfo['params'] ?: [];
+                        $thisObj = new Param(
+                            new Variable('thisObj'), null, null, true
+                        );
+                        $params[] = $thisObj;
+                        $functionStmt->params = $params;
+                    }
+                    if ($methodInfo['doc_comment']) {
+                        $functionStmt->setDocComment($methodInfo['doc_comment']);
+                    }
+                    if ($methodInfo['return_type']) {
+                        $functionStmt->returnType = $methodInfo['return_type'];
+                    }
                     $fileStmts[] = $functionStmt;
                 }
             }
