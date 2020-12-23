@@ -80,7 +80,7 @@ $classDefinitions = array (
                                 ),
                         ),
                 ),
-            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/examples/dist/Foo.php',
+            'ƒile_path' => __DIR__ . '/Foo.php',
         ),
     'Lxj\\ClosurePHP\\Demo\\Bar' =>
         array (
@@ -183,7 +183,7 @@ $classDefinitions = array (
                         ),
                 ),
             'extends' => 'Lxj\\ClosurePHP\\Demo\\Foo',
-            'ƒile_path' => '/Users/luoxiaojun/php/closure-php/examples/dist/Bar.php',
+            'ƒile_path' => __DIR__ . '/Bar.php',
         ),
 );
 
