@@ -44,8 +44,14 @@ class Transformer
                     foreach ($uses as $useUse) {
                         $useInfo = [];
                         $useClassName = implode('\\', $useUse->name->parts);
-                        //TODO alias
-                        $realUseClassName =  $useUse->name->parts[count($useUse->name->parts) - 1];
+                        $alias = $useUse->getAlias();
+                        if ($alias) {
+                            $aliasName = $alias->toString();
+                            $useInfo['alias'] = $aliasName;
+                            $realUseClassName = $aliasName;
+                        } else {
+                            $realUseClassName = $useUse->name->parts[count($useUse->name->parts) - 1];
+                        }
                         $useInfo['name'] = $useClassName;
                         $classInfo['uses'][$realUseClassName] = $useInfo;
                     }
