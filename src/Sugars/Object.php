@@ -280,7 +280,7 @@ function getClass($objectData)
 
 function serialize($objectData, $phpSerialize = false)
 {
-    return $phpSerialize ? serialize($objectData) : json_encode($objectData);
+    return $phpSerialize ? \serialize($objectData) : json_encode($objectData);
 }
 
 /**
